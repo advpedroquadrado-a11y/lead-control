@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lead Control²</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:"DM Sans",sans-serif}</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo } = React;
+
+
+
+const LOGO = "data:image/png;base64,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";
+
+// ── Constantes ────────────────────────────────────────────────────────────────
+const BENEFICIOS = ["Maternidade","Aposentadoria Híbrida","Auxílio Acidente","Aposentadoria por Tempo de Contribuição","Aposentadoria Urbana","Aposentadoria por Idade Rural","Auxílio Doença","Aposentadoria por Invalidez"];
+const CORES = {"Maternidade":"#f472b6","Aposentadoria Híbrida":"#a78bfa","Auxílio Acidente":"#fb923c","Aposentadoria por Tempo de Contribuição":"#34d399","Aposentadoria Urbana":"#60a5fa","Aposentadoria por Idade Rural":"#fbbf24","Auxílio Doença":"#f87171","Aposentadoria por Invalidez":"#818cf8"};
+const STATUS = [{v:"Qualificado",l:"Qualificado",e:"⭐",c:"#f59e0b"},{v:"Desqualificado",l:"Desqualificado",e:"🚫",c:"#ef4444"},{v:"Desconhecido",l:"Desconhecido",e:"❓",c:"#6b7280"}];
+const ETAPAS = [{v:"Organização Interna",c:"#6b7280",e:"📁"},{v:"Protocolado INSS",c:"#3b82f6",e:"📋"},{v:"Montando Inicial",c:"#f59e0b",e:"⚙️"},{v:"Ajuizado",c:"#a78bfa",e:"⚖️"},{v:"Deferido",c:"#10b981",e:"✅"},{v:"Indeferido",c:"#ef4444",e:"❌"}];
+const EMAILS_FIXOS = ["recepcao.pedroquadrado@gmail.com","souza.admjuridico@gmail.com","thaisebsadv@gmail.com","recepcao2.pedroquadrado@gmail.com"];
+const FORM0 = {nome:"",telefone:"",cpf:"",beneficio:"",fechou:"",status:"",data:new Date().toISOString().split("T")[0],dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:""};
+const SKEY="crm_v6_clientes", UKEY="crm_v6_usuarios", MKEY="crm_v6_metas", LKEY="crm_v6_logs", TKEY="crm_v6_tema";
+const ADMIN = {id:"admin_fixo",nome:"Admin",usuario:"admin",senha:"admin123",role:"admin"};
+const DEFAULT_USERS = [
+  {id:"user_pedro",    nome:"Pedro Quadrado",            usuario:"pedro.quadrado",senha:"98897722",role:"admin"},
+  {id:"user_gabrielli",nome:"Gabrielli Gabriel Citolino",usuario:"gabrielli",     senha:"1234",   role:"membro"},
+  {id:"user_jana",     nome:"Jana Tiburcio",             usuario:"jana",          senha:"1234",   role:"membro"},
+];
+const SEED_CLIENTES = [
+  {id:1001,nome:"Ercilia",          telefone:"(22) 99869-2209",cpf:"",beneficio:"Maternidade",                   fechou:"Não",status:"Desconhecido",  data:"2026-03-23",dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:"Pedro Quadrado",            historico:[{quando:"2026-03-23T00:00:00.000Z",por:"Pedro Quadrado",            acao:"Cadastrado"}]},
+  {id:1002,nome:"Maria",            telefone:"(44) 99970-3310",cpf:"",beneficio:"Auxílio Acidente",              fechou:"Não",status:"Desconhecido",  data:"2026-03-23",dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:"Pedro Quadrado",            historico:[{quando:"2026-03-23T00:00:00.000Z",por:"Pedro Quadrado",            acao:"Cadastrado"}]},
+  {id:1003,nome:"Izabel Honorato",  telefone:"(44) 97743-82",  cpf:"",beneficio:"Aposentadoria por Idade Rural", fechou:"Não",status:"Desconhecido",  data:"2026-03-23",dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:"Gabrielli Gabriel Citolino",historico:[{quando:"2026-03-23T00:00:00.000Z",por:"Gabrielli Gabriel Citolino",acao:"Cadastrado"}]},
+  {id:1004,nome:"Maria Darci",      telefone:"(11) 95849-0622",cpf:"",beneficio:"Auxílio Acidente",              fechou:"Não",status:"Desconhecido",  data:"2026-03-23",dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:"Gabrielli Gabriel Citolino",historico:[{quando:"2026-03-23T00:00:00.000Z",por:"Gabrielli Gabriel Citolino",acao:"Cadastrado"}]},
+  {id:1005,nome:"Maurilio Rodrigues",telefone:"(67) 99165-622",cpf:"",beneficio:"Auxílio Acidente",              fechou:"Não",status:"Desconhecido",  data:"2026-03-23",dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:"Gabrielli Gabriel Citolino",historico:[{quando:"2026-03-23T00:00:00.000Z",por:"Gabrielli Gabriel Citolino",acao:"Cadastrado"}]},
+  {id:1006,nome:"Madalena Sousa",   telefone:"(89) 94118-844", cpf:"",beneficio:"Maternidade",                   fechou:"Não",status:"Desconhecido",  data:"2026-03-23",dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:"Jana Tiburcio",             historico:[{quando:"2026-03-23T00:00:00.000Z",por:"Jana Tiburcio",             acao:"Cadastrado"}]},
+  {id:1007,nome:"Osvaldo",          telefone:"(44) 91164-288", cpf:"",beneficio:"Auxílio Acidente",              fechou:"Não",status:"Desconhecido",  data:"2026-03-23",dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:"Gabrielli Gabriel Citolino",historico:[{quando:"2026-03-23T00:00:00.000Z",por:"Gabrielli Gabriel Citolino",acao:"Cadastrado"}]},
+  {id:1008,nome:"Luiza",            telefone:"(86) 98871-7968",cpf:"",beneficio:"Maternidade",                   fechou:"Não",status:"Desqualificado",data:"2026-03-23",dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:"Gabrielli Gabriel Citolino",historico:[{quando:"2026-03-23T00:00:00.000Z",por:"Gabrielli Gabriel Citolino",acao:"Cadastrado"}]},
+  {id:1009,nome:"Dona Maria",       telefone:"(44) 98254-400", cpf:"",beneficio:"Aposentadoria Híbrida",         fechou:"Não",status:"Desconhecido",  data:"2026-03-23",dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:"Gabrielli Gabriel Citolino",historico:[{quando:"2026-03-23T00:00:00.000Z",por:"Gabrielli Gabriel Citolino",acao:"Cadastrado"}]},
+  {id:1010,nome:"Lucia",            telefone:"(73) 88365-965", cpf:"",beneficio:"Maternidade",                   fechou:"Não",status:"Desconhecido",  data:"2026-03-24",dataFechamento:"",dataRetorno:"",observacao:"",numInss:"",numJudicial:"",etapaProcesso:"",por:"Jana Tiburcio",             historico:[{quando:"2026-03-24T00:00:00.000Z",por:"Jana Tiburcio",             acao:"Cadastrado"}]},
+];
+
+// ── Utilitários ───────────────────────────────────────────────────────────────
+const fPhone=v=>{const d=v.replace(/\D/g,"").slice(0,11);if(d.length<=2)return d;if(d.length<=7)return`(${d.slice(0,2)}) ${d.slice(2)}`;return`(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;};
+const fCPF=v=>{const d=v.replace(/\D/g,"").slice(0,11);if(d.length<=3)return d;if(d.length<=6)return`${d.slice(0,3)}.${d.slice(3)}`;if(d.length<=9)return`${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6)}`;return`${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}`;};
+const nNome=s=>(s||"").trim().toLowerCase().replace(/\s+/g," ");
+const nCPF=s=>(s||"").replace(/\D/g,"");
+const fmtDate=d=>d?new Date(d+"T00:00:00").toLocaleDateString("pt-BR"):"-";
+const diasEntre=(a,b)=>Math.round((new Date(b)-new Date(a))/(1000*60*60*24));
+const hoje=()=>new Date().toISOString().split("T")[0];
+
+// ── Storage: window.storage (compartilhado no Claude.ai) ────────────────────
+const loadDB=async(k,fallback=[])=>{
+  try{
+    const r=await window.storage.get(k,true);
+    if(r&&r.value!==undefined&&r.value!==null){
+      const parsed=JSON.parse(r.value);
+      return parsed;
+    }
+    return fallback;
+  }catch(e){
+    console.error("loadDB error:",e);
+    return fallback;
+  }
+};
+const saveDB=async(k,d)=>{
+  try{
+    await window.storage.set(k,JSON.stringify(d),true);
+  }catch(e){
+    console.error("saveDB error:",e);
+  }
+};
+
+// ── Estilos ───────────────────────────────────────────────────────────────────
+const mkS=dark=>({bg:dark?"#0a1628":"#f0f4f8",bg2:dark?"linear-gradient(135deg,#1e293b,#162033)":"linear-gradient(135deg,#fff,#f8fafc)",border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",text:dark?"#e2e8f0":"#1e293b",text2:"#64748b",inp:dark?"#0a1628":"#fff",inpB:dark?"1px solid #1e3a5f":"1px solid #cbd5e1",header:dark?"linear-gradient(135deg,#1e293b,#0f172a)":"linear-gradient(135deg,#fff,#f8fafc)"});
+const BP={padding:"12px 24px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#b8975a,#d4af6e)",color:"#fff",fontWeight:700,fontSize:14};
+
+// ── Componentes estáticos ─────────────────────────────────────────────────────
+const Lbl=({t})=><label style={{display:"block",fontSize:12,fontWeight:700,color:"#64748b",marginBottom:6,textTransform:"uppercase",letterSpacing:"0.5px"}}>{t}</label>;
+const Field=({label,children})=><div style={{marginBottom:16}}><Lbl t={label}/>{children}</div>;
+const DtIn=({label,value,onChange})=><div><Lbl t={label}/><input type="date" style={{width:"100%",padding:"10px 14px",borderRadius:8,border:"1px solid #1e3a5f",background:"#0a1628",color:"#e2e8f0",fontSize:14,outline:"none"}} value={value} onChange={e=>onChange(e.target.value)}/></div>;
+const Badge=({text,color})=><span style={{fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:99,background:color+"22",color,border:`1px solid ${color}44`,whiteSpace:"nowrap"}}>{text}</span>;
+const RowInfo=({label,value})=><div style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid #1e3a5f"}}><span style={{fontSize:12,color:"#64748b",fontWeight:600,textTransform:"uppercase"}}>{label}</span><span style={{fontSize:13,fontWeight:600}}>{value||"—"}</span></div>;
+
+export default function App(){
+  const[db,setDb]=useState([]);
+  const[usuarios,setUsuarios]=useState([]);
+  const[metas,setMetas]=useState({});
+  const[logs,setLogs]=useState([]);
+  const[dark,setDark]=useState(true);
+  const[loaded,setLoaded]=useState(false);
+  const[session,setSession]=useState(null);
+  const[lForm,setLForm]=useState({usuario:"",senha:""});
+  const[lErr,setLErr]=useState("");
+  const[lView,setLView]=useState("login");
+  const[cadForm,setCadForm]=useState({nome:"",usuario:"",senha:"",senha2:""});
+  const[eqBusca,setEqBusca]=useState(""); const[eqResult,setEqResult]=useState(null); const[novaSenha,setNovaSenha]=useState("");
+  const[form,setForm]=useState(FORM0);
+  const[view,setView]=useState("dashboard");
+  const[editId,setEditId]=useState(null);
+  const[toast,setToast]=useState(null);
+  const[delId,setDelId]=useState(null);
+  const[dupModal,setDupModal]=useState(null);
+  const[viewRec,setViewRec]=useState(null);
+  const[csvModal,setCsvModal]=useState(null);
+  const[anotaModal,setAnotaModal]=useState(null); const[anotaTexto,setAnotaTexto]=useState("");
+  const[agendaModal,setAgendaModal]=useState(null);
+  const[agendaForm,setAgendaForm]=useState({titulo:"",data:"",horaIni:"09:00",horaFim:"10:00",local:"",descricao:"",convidados:"",lembrete:30,meet:false,cor:"7"});
+  const[agendaSaving,setAgendaSaving]=useState(false);
+  const[agendaSaved,setAgendaSaved]=useState(null);
+  const[adminTab,setAdminTab]=useState("usuarios");
+  const[newUser,setNewUser]=useState({nome:"",usuario:"",senha:"",role:"membro"});
+  const[editUser,setEditUser]=useState(null);
+  const[search,setSearch]=useState("");
+  const[showSearch,setShowSearch]=useState(false); const[globalSearch,setGlobalSearch]=useState("");
+  const[fIni,setFIni]=useState(""); const[fFim,setFFim]=useState("");
+  const[fBen,setFBen]=useState(""); const[fFec,setFFec]=useState("");
+  const[fSta,setFSta]=useState(""); const[fMem,setFMem]=useState("");
+  const[fFIni,setFFIni]=useState(""); const[fFFim,setFFFim]=useState("");
+  const[fEtapa,setFEtapa]=useState("");
+  const[metaInput,setMetaInput]=useState(""); const[metaMembro,setMetaMembro]=useState("");
+
+  const S=useMemo(()=>mkS(dark),[dark]);
+  const C=useMemo(()=>({background:S.bg2,border:S.border,borderRadius:14,padding:20,boxShadow:"0 4px 20px rgba(0,0,0,0.1)"}),[S]);
+  const I=useMemo(()=>({width:"100%",padding:"10px 14px",borderRadius:8,border:S.inpB,background:S.inp,color:S.text,fontSize:14,outline:"none"}),[S]);
+  const BS=useMemo(()=>({padding:"10px 18px",borderRadius:8,border:S.border,background:"transparent",color:S.text2,cursor:"pointer",fontWeight:600,fontSize:13}),[S]);
+
+  useEffect(()=>{
+    const s=localStorage.getItem("crm_session"); if(s){try{setSession(JSON.parse(s));}catch{}}
+    const t=localStorage.getItem(TKEY); if(t)setDark(t==="dark");
+  },[]);
+
+  useEffect(()=>{
+    const load=async()=>{
+      let[c,u,m,l]=await Promise.all([loadDB(SKEY,[]),loadDB(UKEY,[]),loadDB(MKEY,{}),loadDB(LKEY,[])]);
+      // Carrega dados do storage e SEMPRE garante que seeds estão presentes
+      const idsStorage = new Set(c.map(x=>String(x.id)));
+      const seedsFaltando = SEED_CLIENTES.filter(s=>!idsStorage.has(String(s.id)));
+      if(seedsFaltando.length > 0){
+        c = [...c, ...seedsFaltando];
+        await saveDB(SKEY, c);
+      }
+      if(c.length === 0){
+        c = [...SEED_CLIENTES];
+        await saveDB(SKEY, c);
+      }
+      setDb(c); setUsuarios(u); setMetas(m&&!Array.isArray(m)?m:{}); setLogs(l); setLoaded(true);
+    };
+    load(); const iv=setInterval(load,15000); return()=>clearInterval(iv);
+  },[]);
+
+  const toast_=(msg,type="success")=>{setToast({msg,type});setTimeout(()=>setToast(null),3500);};
+  const toggleTema=()=>{const nd=!dark;setDark(nd);localStorage.setItem(TKEY,nd?"dark":"light");};
+
+  const allUsers=()=>{
+    const l=usuarios.length>0?usuarios:[];
+    const base=l.some(u=>u.usuario==="admin")?l:[ADMIN,...l];
+    const res=[...base];
+    DEFAULT_USERS.forEach(du=>{if(!res.some(u=>u.usuario===du.usuario))res.push(du);});
+    return res;
+  };
+
+  const doLogin=async()=>{
+    if(!loaded){setLErr("Aguarde...");return;}
+    const u=allUsers().find(u=>u.usuario.toLowerCase()===lForm.usuario.toLowerCase().trim()&&u.senha===lForm.senha);
+    if(!u){setLErr("Usuário ou senha incorretos.");return;}
+    const s={id:u.id,nome:u.nome,usuario:u.usuario,role:u.role};
+    setSession(s); localStorage.setItem("crm_session",JSON.stringify(s)); setLErr("");
+    const novoLog={usuario:u.nome,quando:new Date().toISOString(),acao:"Login"};
+    const logsAt=await loadDB(LKEY);
+    const lu=[novoLog,...logsAt].slice(0,200);
+    setLogs(lu); await saveDB(LKEY,lu);
+  };
+  const doLogout=()=>{setSession(null);localStorage.removeItem("crm_session");setLForm({usuario:"",senha:""});};
+
+  const doCadastro=async()=>{
+    setLErr("");
+    if(!cadForm.nome||!cadForm.usuario||!cadForm.senha){setLErr("Preencha todos os campos.");return;}
+    if(cadForm.senha.length<4){setLErr("Senha mínimo 4 caracteres.");return;}
+    if(cadForm.senha!==cadForm.senha2){setLErr("Senhas não conferem.");return;}
+    if(allUsers().find(u=>u.usuario===cadForm.usuario)){setLErr("Usuário já existe.");return;}
+    const nova=[...usuarios,{id:Date.now(),nome:cadForm.nome,usuario:cadForm.usuario,senha:cadForm.senha,role:"membro"}];
+    setUsuarios(nova); await saveDB(UKEY,nova); setLView("criado");
+  };
+
+  const buscarEsqueci=()=>{
+    const q=eqBusca.toLowerCase().trim();if(!q)return;
+    const f=allUsers().find(u=>u.usuario.toLowerCase()===q||u.nome.toLowerCase().includes(q));
+    if(f){setEqResult(f);}else{setLErr("Usuário não encontrado.");}
+  };
+  const resetarSenha=async()=>{
+    if(!novaSenha||novaSenha.length<4){toast_("Mínimo 4 caracteres.","error");return;}
+    let nova;
+    if(eqResult.id==="admin_fixo"||DEFAULT_USERS.some(d=>d.id===eqResult.id)){
+      nova=[...usuarios.filter(u=>u.usuario!==eqResult.usuario&&u.id!==eqResult.id),{...eqResult,senha:novaSenha}];
+    }else{nova=usuarios.map(u=>u.id===eqResult.id?{...u,senha:novaSenha}:u);}
+    setUsuarios(nova); await saveDB(UKEY,nova);
+    setLView("resetado"); setNovaSenha(""); setEqBusca(""); setEqResult(null);
+  };
+
+  const saveUsers=async l=>{setUsuarios(l);await saveDB(UKEY,l);};
+  const addUser=async()=>{
+    if(!newUser.nome||!newUser.usuario||!newUser.senha){toast_("Preencha todos os campos.","error");return;}
+    if(allUsers().find(u=>u.usuario===newUser.usuario)){toast_("Usuário já existe.","error");return;}
+    await saveUsers([...usuarios,{...newUser,id:Date.now()}]);
+    setNewUser({nome:"",usuario:"",senha:"",role:"membro"}); toast_("Usuário criado!");
+  };
+  const saveEditUser=async(eu)=>{
+    const u=eu||editUser;
+    if(!u.nome||!u.usuario){toast_("Preencha nome e usuário.","error");return;}
+    if(allUsers().find(x=>x.usuario===u.usuario&&x.id!==u.id)){toast_("Usuário já existe.","error");return;}
+    const final={...u,senha:u.novaSenhaEdit&&u.novaSenhaEdit.length>=4?u.novaSenhaEdit:u.senha};
+    delete final.novaSenhaEdit;
+    let lista;
+    if(final.id==="admin_fixo"||DEFAULT_USERS.some(d=>d.id===final.id)){const sem=usuarios.filter(x=>x.usuario!==final.usuario&&x.id!==final.id);lista=[...sem,final];}
+    else{lista=usuarios.map(x=>x.id===final.id?final:x);}
+    await saveUsers(lista); setEditUser(null); setAdminTab("usuarios"); toast_("Usuário atualizado!");
+  };
+  const removeUser=async id=>{
+    if(id===session?.id){toast_("Não pode remover seu próprio usuário.","error");return;}
+    await saveUsers(usuarios.filter(u=>u.id!==id)); toast_("Removido.","error");
+  };
+  const saveMeta=async()=>{
+    const nome=metaMembro||session?.nome; const val=parseInt(metaInput);
+    if(!val||val<1){toast_("Meta inválida.","error");return;}
+    const nm={...metas,[nome]:val}; setMetas(nm); await saveDB(MKEY,nm);
+    toast_(`Meta de ${val} fechamentos salva para ${nome}!`); setMetaInput("");
+  };
+
+  const findDups=(f,skipId=null)=>{
+    const nn=nNome(f.nome),nc=nCPF(f.cpf);
+    return db.filter(c=>{if(c.id===skipId)return false;return(nc&&nCPF(c.cpf)&&nCPF(c.cpf)===nc)||(nn&&nNome(c.nome)===nn);});
+  };
+  const submit=async(force=false)=>{
+    if(!form.nome||!form.telefone||!form.beneficio||!form.fechou||!form.status){toast_("Preencha todos os campos obrigatórios!","error");return;}
+    if(!force){const d=findDups(form,editId);if(d.length>0){setDupModal(d);return;}}
+    const agora=new Date().toISOString();
+    let updated;
+    if(editId){updated=db.map(c=>{if(c.id!==editId)return c;const hist=[...(c.historico||[]),{quando:agora,por:session?.nome||"",acao:"Editado"}];return{...form,id:editId,por:c.por,historico:hist};});}
+    else{const novo={...form,id:Date.now(),por:session?.nome||"",historico:[{quando:agora,por:session?.nome||"",acao:"Cadastrado"}]};updated=[novo,...db];}
+    setDb(updated); await saveDB(SKEY,updated);
+    toast_(editId?"Cliente atualizado!":"Cliente cadastrado!");
+    setEditId(null); setDupModal(null); setForm({...FORM0,por:session?.nome||""}); setView("lista");
+  };
+  const doEdit=c=>{setForm({...c});setEditId(c.id);setView("cadastro");};
+  const doDelete=async id=>{const u=db.filter(c=>c.id!==id);setDb(u);await saveDB(SKEY,u);setDelId(null);toast_("Removido.","error");};
+  const clearF=()=>{setFIni("");setFFim("");setFBen("");setFFec("");setFSta("");setFMem("");setSearch("");setFFIni("");setFFFim("");setFEtapa("");};
+  const navTo=id=>{setView(id);if(id==="cadastro"){setForm({...FORM0,por:session?.nome||""});setEditId(null);setDupModal(null);}};
+  const members=useMemo(()=>[...new Set(db.map(c=>c.por).filter(Boolean))],[db]);
+
+  const salvarAnota=async()=>{
+    if(!anotaTexto.trim()||!anotaModal)return;
+    const nova={texto:anotaTexto.trim(),por:session?.nome||"",quando:new Date().toISOString()};
+    const updated=db.map(c=>c.id!==anotaModal.id?c:{...c,anotacoes:[...(c.anotacoes||[]),nova]});
+    setDb(updated); await saveDB(SKEY,updated);
+    setAnotaModal(updated.find(c=>c.id===anotaModal.id)); setAnotaTexto(""); toast_("Anotação salva!");
+  };
+  const deletarAnota=async(cId,idx)=>{
+    const updated=db.map(c=>c.id!==cId?c:{...c,anotacoes:(c.anotacoes||[]).filter((_,i)=>i!==idx)});
+    setDb(updated); await saveDB(SKEY,updated); setAnotaModal(updated.find(c=>c.id===cId)); toast_("Anotação removida.","error");
+  };
+
+  const abrirAgenda=(c)=>{
+    setAgendaModal(c); setAgendaSaved(null);
+    if(c.eventoAgenda){setAgendaSaved({link:c.eventoAgenda.link,existente:true,evento:c.eventoAgenda});return;}
+    setAgendaForm({titulo:`Reunião - ${c.nome}`,data:hoje(),horaIni:"09:00",horaFim:"10:00",local:"",descricao:`Lead: ${c.nome}\nTelefone: ${c.telefone}\nBenefício: ${c.beneficio}`,convidados:EMAILS_FIXOS.join("\n"),lembrete:30,meet:false,cor:"7"});
+  };
+
+  const criarEvento=async()=>{
+    if(!agendaForm.titulo||!agendaForm.data){toast_("Preencha título e data.","error");return;}
+    setAgendaSaving(true);
+    try{
+      const startDT=`${agendaForm.data}T${agendaForm.horaIni}:00`;
+      const endDT=`${agendaForm.data}T${agendaForm.horaFim}:00`;
+      const tz="America/Sao_Paulo";
+      const manuais=agendaForm.convidados.split(/[,;\n]+/).map(e=>e.trim()).filter(e=>e.includes("@"));
+      const todosEmails=[...new Set([...EMAILS_FIXOS,...manuais])];
+      const convidadosArr=todosEmails.map(e=>({email:e}));
+      const body={
+        model:"claude-sonnet-4-20250514",max_tokens:1000,
+        messages:[{role:"user",content:`Crie um evento no Google Agenda com estas informações e retorne APENAS o JSON do resultado com campos id e htmlLink. Dados: ${JSON.stringify({summary:agendaForm.titulo,description:agendaForm.descricao||undefined,location:agendaForm.local||undefined,start:{dateTime:startDT,timeZone:tz},end:{dateTime:endDT,timeZone:tz},attendees:convidadosArr.length>0?convidadosArr:undefined,colorId:agendaForm.cor,reminders:{useDefault:false,overrides:[{method:"popup",minutes:agendaForm.lembrete}]},conferenceData:agendaForm.meet?{createRequest:{conferenceSolutionKey:{type:"hangoutsMeet"},requestId:`lc2-${Date.now()}`}}:undefined})}`}],
+        mcp_servers:[{type:"url",url:"https://gcal.mcp.claude.com/mcp",name:"gcal"}]
+      };
+      const resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      const data=await resp.json();
+      const txt=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+      // Extrai link e id
+      let eventoLink=null,eventoId=null;
+      try{
+        const parts=txt.split("https://calendar.google.com/");
+        if(parts.length>1)eventoLink="https://calendar.google.com/"+parts[1].split(/[\s"')]/)[0];
+        const idM=txt.match(/"id"[ ]*:[ ]*"([^"]+)"/);
+        if(idM)eventoId=idM[1];
+      }catch(ex){}
+      // SEMPRE salva no cliente
+      if(agendaModal?.id){
+        const dadoEvento={link:eventoLink,eventoId,titulo:agendaForm.titulo,data:agendaForm.data,hora:agendaForm.horaIni,horaFim:agendaForm.horaFim,local:agendaForm.local||"",criadoEm:new Date().toISOString(),criadoPor:session?.nome||""};
+        const updated=db.map(c=>c.id===agendaModal.id?{...c,eventoAgenda:dadoEvento}:c);
+        setDb(updated); await saveDB(SKEY,updated);
+        setAgendaModal(m=>updated.find(c=>c.id===m?.id)||m);
+      }
+      setAgendaSaved({link:eventoLink,texto:txt});
+      toast_("✅ Evento criado no Google Agenda!");
+    }catch(e){console.error(e);toast_("Erro ao criar evento.","error");}
+    setAgendaSaving(false);
+  };
+
+  const deletarAgendamento=async(clienteId,dadoEvento)=>{
+    const updated=db.map(c=>c.id===clienteId?{...c,eventoAgenda:null}:c);
+    setDb(updated); await saveDB(SKEY,updated);
+    toast_("Removendo do Google Agenda...");
+    try{
+      let eventId=dadoEvento?.eventoId;
+      if(!eventId&&dadoEvento?.link){
+        const m1=dadoEvento.link.match(/[?&]eid=([^&]+)/u);
+        const m2=dadoEvento.link.match(/eventedit[/]([^/?]+)/u);
+        if(m1)eventId=decodeURIComponent(m1[1]);else if(m2)eventId=m2[1];
+      }
+      if(eventId){
+        const body={model:"claude-sonnet-4-20250514",max_tokens:500,messages:[{role:"user",content:`Delete o evento do Google Agenda com ID: "${eventId}". Use a ferramenta gcal_delete_event com calendarId="primary" e eventId="${eventId}". Confirme quando feito.`}],mcp_servers:[{type:"url",url:"https://gcal.mcp.claude.com/mcp",name:"gcal"}]};
+        const resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+        const data=await resp.json();
+        const txt=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+        if(txt.toLowerCase().includes("delet")||txt.toLowerCase().includes("remov")){toast_("✅ Evento excluído do Google Agenda!");}
+        else{toast_("Removido do sistema. Verifique a agenda.","error");}
+      }else{toast_("Removido do sistema. ID não encontrado na agenda.","error");}
+    }catch(e){toast_("Removido do sistema, mas erro na agenda.","error");}
+  };
+
+  const exportarBackup=()=>{
+    const bk={clientes:db,usuarios,metas,exportadoEm:new Date().toISOString(),versao:"Lead Control v2"};
+    const uri="data:application/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(bk,null,2));
+    const a=document.createElement("a");a.href=uri;a.download=`LeadControl_Backup_${new Date().toLocaleDateString("pt-BR").replace(/[/]/g,"-")}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);
+    toast_(`Backup exportado com ${db.length} clientes!`);
+  };
+  const importarBackup=async(e)=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=async(ev)=>{
+      try{
+        const bk=JSON.parse(ev.target.result);
+        if(!bk.clientes||!Array.isArray(bk.clientes)){toast_("Arquivo inválido.","error");return;}
+        if(!window.confirm(`Importar ${bk.clientes.length} clientes? Os dados atuais serão substituídos.`))return;
+        setDb(bk.clientes);await saveDB(SKEY,bk.clientes);
+        if(bk.usuarios){setUsuarios(bk.usuarios);await saveDB(UKEY,bk.usuarios);}
+        if(bk.metas){setMetas(bk.metas);await saveDB(MKEY,bk.metas);}
+        toast_(`✅ Backup importado! ${bk.clientes.length} clientes restaurados.`);
+      }catch{toast_("Erro ao ler o arquivo.","error");}
+    };
+    reader.readAsText(file); e.target.value="";
+  };
+
+  const exportarCSV=()=>{
+    if(rows.length===0){toast_("Nenhum dado para exportar.","error");return;}
+    const h=["Nome","Telefone","CPF","Benefício","Status","Fechou","Etapa","Nº INSS","Nº Judicial","Data Cadastro","Data Fechamento","Retorno","Cadastrado por","Observações"];
+    const esc=v=>{const s=String(v||"");return s.includes("\t")||s.includes('"')?`"${s.replace(/"/g,'""')}"`:s;};
+    const csv=[h.join("\t"),...rows.map(c=>[c.nome,c.telefone,c.cpf||"",c.beneficio,c.status,c.fechou,c.etapaProcesso||"",c.numInss||"",c.numJudicial||"",fmtDate(c.data),fmtDate(c.dataFechamento),fmtDate(c.dataRetorno),c.por||"",c.observacao||""].map(esc).join("\t"))].join("\n");
+    setCsvModal(csv);
+  };
+  const copiarCSV=()=>{
+    const ta=document.getElementById("csv-textarea");if(!ta)return;
+    ta.select();ta.setSelectionRange(0,99999);
+    try{document.execCommand("copy");toast_("✅ Copiado! Cole no Google Sheets (Ctrl+V)");}
+    catch{toast_("Texto selecionado! Pressione Ctrl+C.","error");}
+  };
+
+  const filtersActive=fIni||fFim||fBen||fFec||fSta||fMem||fFIni||fFFim||search||fEtapa;
+
+  const rows=useMemo(()=>{
+    if(view==="cadastro")return db;
+    return db.filter(c=>{
+      if(fIni&&c.data<fIni)return false; if(fFim&&c.data>fFim)return false;
+      if(fBen&&c.beneficio!==fBen)return false; if(fFec&&c.fechou!==fFec)return false;
+      if(fSta&&c.status!==fSta)return false; if(fMem&&c.por!==fMem)return false;
+      if(fFIni&&(!c.dataFechamento||c.dataFechamento<fFIni))return false;
+      if(fFFim&&(!c.dataFechamento||c.dataFechamento>fFFim))return false;
+      if(fEtapa&&c.etapaProcesso!==fEtapa)return false;
+      if(search){const q=search.toLowerCase();if(!c.nome.toLowerCase().includes(q)&&!(c.telefone||"").includes(q)&&!(c.cpf||"").includes(q))return false;}
+      return true;
+    });
+  },[db,view,fIni,fFim,fBen,fFec,fSta,fMem,search,fFIni,fFFim,fEtapa]);
+
+  const retornarHoje=useMemo(()=>db.filter(c=>c.dataRetorno===hoje()&&c.fechou!=="Sim"),[db]);
+  const semContato=useMemo(()=>db.filter(c=>{if(c.fechou==="Sim")return false;const ref=c.dataRetorno||c.data;if(!ref)return false;return diasEntre(ref,hoje())>=7;}),[db]);
+
+  const stats=useMemo(()=>{
+    if(view==="cadastro")return{total:0,fechados:0,naoFechados:0,porSt:{},porBen:{},porUser:{},porUserF:{},tempoMedio:null,funil:{total:0,qualificados:0,fechados:0},evolucao:[],taxaDeferimento:{}};
+    const total=rows.length,fechados=rows.filter(c=>c.fechou==="Sim").length,naoFechados=rows.filter(c=>c.fechou==="Não").length;
+    const porSt={};STATUS.forEach(s=>{porSt[s.v]=rows.filter(c=>c.status===s.v).length;});
+    const porBen={};BENEFICIOS.forEach(b=>{porBen[b]=rows.filter(c=>c.beneficio===b).length;});
+    const porUser={};rows.forEach(c=>{const v=c.por||"?";porUser[v]=(porUser[v]||0)+1;});
+    const porUserF={};rows.filter(c=>c.fechou==="Sim").forEach(c=>{const v=c.por||"?";porUserF[v]=(porUserF[v]||0)+1;});
+    const comF=rows.filter(c=>c.fechou==="Sim"&&c.data&&c.dataFechamento);
+    const tempoMedio=comF.length>0?Math.round(comF.reduce((a,c)=>a+diasEntre(c.data,c.dataFechamento),0)/comF.length):null;
+    const funil={total:db.length,qualificados:db.filter(c=>c.status==="Qualificado").length,fechados:db.filter(c=>c.fechou==="Sim").length};
+    const evolucao=[];
+    for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);const mes=d.toISOString().slice(0,7);const label=d.toLocaleDateString("pt-BR",{month:"short",year:"2-digit"});evolucao.push({mes,label,entradas:db.filter(c=>c.data&&c.data.startsWith(mes)).length,fechadosMes:db.filter(c=>c.dataFechamento&&c.dataFechamento.startsWith(mes)).length});}
+    const taxaDeferimento={};BENEFICIOS.forEach(b=>{const t=db.filter(c=>c.beneficio===b).length;const def=db.filter(c=>c.beneficio===b&&c.fechou==="Sim").length;taxaDeferimento[b]={total:t,def,taxa:t>0?(def/t*100).toFixed(0):0};});
+    return{total,fechados,naoFechados,porSt,porBen,porUser,porUserF,tempoMedio,funil,evolucao,taxaDeferimento};
+  },[rows,db,view]);
+
+  const ExportBtn=()=><button onClick={exportarCSV} style={{display:"flex",alignItems:"center",gap:8,padding:"10px 18px",borderRadius:10,border:"1px solid #34d39966",background:"rgba(52,211,153,0.08)",color:"#34d399",cursor:"pointer",fontWeight:700,fontSize:13}}>📊 Exportar Google Sheets</button>;
+
+  const globalResults=useMemo(()=>{if(!globalSearch||globalSearch.length<2)return[];const q=globalSearch.toLowerCase();return db.filter(c=>c.nome.toLowerCase().includes(q)||(c.telefone||"").includes(q)||(c.cpf||"").includes(q)).slice(0,8);},[globalSearch,db]);
+
+  // ── LOGIN ─────────────────────────────────────────────────────────────────
+  if(!session)return(
+    <div style={{minHeight:"100vh",fontFamily:"DM Sans,sans-serif",display:"flex",position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",inset:0,background:"#080f1e"}}/>
+      <div style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",overflow:"hidden",pointerEvents:"none"}}>
+        <div style={{position:"absolute",top:-200,left:"55%",width:3,height:"160%",background:"linear-gradient(to bottom,transparent,rgba(184,151,90,0.25),transparent)",transform:"rotate(-8deg)"}}/>
+        <div style={{position:"absolute",top:-200,left:"57%",width:1,height:"160%",background:"linear-gradient(to bottom,transparent,rgba(184,151,90,0.1),transparent)",transform:"rotate(-8deg)"}}/>
+        <div style={{position:"absolute",top:0,right:0,width:"46%",height:"100%",background:"linear-gradient(135deg,rgba(184,151,90,0.04),rgba(184,151,90,0.02))"}}/>
+      </div>
+      {/* Lado esquerdo */}
+      <div style={{flex:"0 0 52%",position:"relative",zIndex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"64px 80px"}}>
+        <div>
+          <div style={{fontSize:11,color:"rgba(184,151,90,0.7)",fontWeight:700,letterSpacing:"4px",textTransform:"uppercase",marginBottom:20}}>Sistema de Gestão</div>
+          <h1 style={{margin:"0 0 16px",fontSize:60,fontWeight:900,color:"#f8fafc",lineHeight:1,letterSpacing:"-3px"}}>
+            Lead<br/><span style={{fontSize:64,background:"linear-gradient(135deg,#b8975a 30%,#e8cc8a 60%,#b8975a 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>Control²</span>
+          </h1>
+          <p style={{margin:"0 0 48px",fontSize:16,color:"rgba(148,163,184,0.8)",lineHeight:1.7,maxWidth:340}}>Gerencie seus leads e alcance suas metas com inteligência.</p>
+          <div style={{display:"flex",flexDirection:"column",gap:14}}>
+            {[["⚖️","Processos INSS e Judiciais","Acompanhe cada etapa"],["📊","Dashboard Completo","Funil, metas e evolução mensal"],["👥","Gestão de Equipe","Leads, anotações e histórico"]].map(([icon,title,sub])=>(
+              <div key={title} style={{display:"flex",alignItems:"center",gap:14,padding:"14px 18px",borderRadius:12,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(184,151,90,0.1)"}}>
+                <span style={{fontSize:22,flexShrink:0}}>{icon}</span>
+                <div><div style={{fontSize:13,fontWeight:700,color:"#e2e8f0",marginBottom:2}}>{title}</div><div style={{fontSize:11,color:"#475569"}}>{sub}</div></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {/* Lado direito */}
+      <div style={{flex:1,position:"relative",zIndex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:40}}>
+        <div style={{width:"100%",maxWidth:380,background:"rgba(255,255,255,0.025)",border:"1px solid rgba(184,151,90,0.15)",borderRadius:20,padding:"40px 36px",backdropFilter:"blur(20px)",boxShadow:"0 32px 80px rgba(0,0,0,0.5)"}}>
+          {lView==="login"&&<>
+            <h2 style={{margin:"0 0 6px",color:"#f8fafc",fontWeight:800,fontSize:22,letterSpacing:"-0.5px"}}>Bem-vindo de volta</h2>
+            <p style={{margin:"0 0 28px",color:"#475569",fontSize:13}}>Entre com suas credenciais</p>
+            {lErr&&<div style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",borderRadius:10,padding:"11px 14px",fontSize:13,color:"#f87171",marginBottom:20}}>❌ {lErr}</div>}
+            <div style={{marginBottom:16}}>
+              <label style={{display:"block",fontSize:11,fontWeight:700,color:"#64748b",marginBottom:7,textTransform:"uppercase",letterSpacing:"1px"}}>Usuário</label>
+              <input style={{width:"100%",padding:"13px 16px",borderRadius:10,border:"1px solid rgba(184,151,90,0.15)",background:"rgba(255,255,255,0.03)",color:"#f0f9ff",fontSize:14,outline:"none",boxSizing:"border-box"}} placeholder="Digite seu usuário" value={lForm.usuario} onChange={e=>setLForm({...lForm,usuario:e.target.value})} onKeyDown={e=>e.key==="Enter"&&doLogin()} autoFocus/>
+            </div>
+            <div style={{marginBottom:24}}>
+              <label style={{display:"block",fontSize:11,fontWeight:700,color:"#64748b",marginBottom:7,textTransform:"uppercase",letterSpacing:"1px"}}>Senha</label>
+              <input type="password" style={{width:"100%",padding:"13px 16px",borderRadius:10,border:"1px solid rgba(184,151,90,0.15)",background:"rgba(255,255,255,0.03)",color:"#f0f9ff",fontSize:14,outline:"none",boxSizing:"border-box"}} placeholder="••••••••" value={lForm.senha} onChange={e=>setLForm({...lForm,senha:e.target.value})} onKeyDown={e=>e.key==="Enter"&&doLogin()}/>
+            </div>
+            <button onClick={doLogin} style={{width:"100%",padding:"14px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#b8975a,#d4af6e)",color:"#fff",fontWeight:800,fontSize:15,marginBottom:12,boxShadow:"0 4px 24px rgba(184,151,90,0.4)"}}>Entrar</button>
+            <div style={{display:"flex",gap:8,marginBottom:20}}>
+              <button onClick={()=>{setLView("cadastro");setLErr("");setCadForm({nome:"",usuario:"",senha:"",senha2:""});}} style={{flex:1,padding:"10px",borderRadius:10,border:"1px solid rgba(184,151,90,0.2)",background:"transparent",color:"#b8975a",cursor:"pointer",fontWeight:600,fontSize:12}}>➕ Criar conta</button>
+              <button onClick={()=>{setLView("esqueci");setLErr("");setEqResult(null);}} style={{flex:1,padding:"10px",borderRadius:10,border:"1px solid rgba(100,116,139,0.2)",background:"transparent",color:"#64748b",cursor:"pointer",fontWeight:600,fontSize:12}}>🔑 Esqueci senha</button>
+            </div>
+            <div style={{padding:"10px 14px",background:"rgba(255,255,255,0.02)",borderRadius:8,border:"1px solid rgba(255,255,255,0.04)",textAlign:"center"}}>
+              <p style={{margin:0,color:"#334155",fontSize:11}}>Acesso padrão: <strong style={{color:"#b8975a"}}>admin</strong> / <strong style={{color:"#b8975a"}}>admin123</strong></p>
+            </div>
+          </>}
+          {lView==="cadastro"&&<>
+            <button onClick={()=>{setLView("login");setLErr("");}} style={{background:"none",border:"none",color:"#64748b",cursor:"pointer",fontSize:13,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Voltar</button>
+            <h2 style={{margin:"0 0 4px",color:"#f0f9ff",fontWeight:800,fontSize:20}}>Criar conta</h2>
+            <p style={{margin:"0 0 24px",color:"#475569",fontSize:13}}>Preencha seus dados</p>
+            {lErr&&<div style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",borderRadius:10,padding:"11px 14px",fontSize:13,color:"#f87171",marginBottom:16}}>❌ {lErr}</div>}
+            {[["Nome completo","text","João Silva",cadForm.nome,v=>setCadForm({...cadForm,nome:v})],["Usuário","text","joao.silva",cadForm.usuario,v=>setCadForm({...cadForm,usuario:v.toLowerCase().replace(/[ ]/g,"")})],["Senha","password","Mínimo 4 caracteres",cadForm.senha,v=>setCadForm({...cadForm,senha:v})],["Confirmar senha","password","Repita a senha",cadForm.senha2,v=>setCadForm({...cadForm,senha2:v})]].map(([label,type,ph,val,fn])=>(
+              <div key={label} style={{marginBottom:14}}>
+                <label style={{display:"block",fontSize:11,fontWeight:700,color:"#64748b",marginBottom:6,textTransform:"uppercase",letterSpacing:"1px"}}>{label}</label>
+                <input type={type} style={{width:"100%",padding:"12px 16px",borderRadius:10,border:"1px solid rgba(184,151,90,0.15)",background:"rgba(255,255,255,0.03)",color:"#f0f9ff",fontSize:14,outline:"none",boxSizing:"border-box"}} placeholder={ph} value={val} onChange={e=>fn(e.target.value)} onKeyDown={e=>e.key==="Enter"&&doCadastro()}/>
+              </div>
+            ))}
+            <button onClick={doCadastro} style={{width:"100%",padding:"14px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#b8975a,#d4af6e)",color:"#fff",fontWeight:800,fontSize:15,marginTop:8,boxShadow:"0 4px 20px rgba(184,151,90,0.3)"}}>✅ Criar minha conta</button>
+          </>}
+          {lView==="criado"&&<div style={{textAlign:"center",padding:"20px 0"}}>
+            <div style={{fontSize:56,marginBottom:14}}>🎉</div>
+            <h2 style={{margin:"0 0 8px",color:"#d4af6e",fontWeight:800,fontSize:22}}>Conta criada!</h2>
+            <button onClick={()=>{setLView("login");setLForm({usuario:cadForm.usuario,senha:cadForm.senha});setLErr("");}} style={{width:"100%",padding:"14px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#b8975a,#d4af6e)",color:"#fff",fontWeight:800,fontSize:15,marginTop:16}}>🔐 Fazer login</button>
+          </div>}
+          {lView==="esqueci"&&<>
+            <button onClick={()=>{setLView("login");setLErr("");setEqBusca("");setEqResult(null);}} style={{background:"none",border:"none",color:"#64748b",cursor:"pointer",fontSize:13,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Voltar</button>
+            <h2 style={{margin:"0 0 4px",color:"#f0f9ff",fontWeight:800,fontSize:20}}>Redefinir senha</h2>
+            <p style={{margin:"0 0 24px",color:"#475569",fontSize:13}}>Informe seu nome ou usuário</p>
+            {lErr&&<div style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",borderRadius:10,padding:"11px 14px",fontSize:13,color:"#f87171",marginBottom:16}}>❌ {lErr}</div>}
+            <div style={{marginBottom:16}}>
+              <label style={{display:"block",fontSize:11,fontWeight:700,color:"#64748b",marginBottom:6,textTransform:"uppercase",letterSpacing:"1px"}}>Nome ou usuário</label>
+              <input style={{width:"100%",padding:"12px 16px",borderRadius:10,border:"1px solid rgba(184,151,90,0.15)",background:"rgba(255,255,255,0.03)",color:"#f0f9ff",fontSize:14,outline:"none",boxSizing:"border-box"}} placeholder="ex: pedro.quadrado" value={eqBusca} onChange={e=>setEqBusca(e.target.value)} onKeyDown={e=>e.key==="Enter"&&buscarEsqueci()}/>
+            </div>
+            {!eqResult&&<button onClick={buscarEsqueci} style={{width:"100%",padding:"13px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#b8975a,#d4af6e)",color:"#fff",fontWeight:700,fontSize:14}}>🔍 Buscar conta</button>}
+            {eqResult&&<>
+              <div style={{background:"rgba(16,185,129,0.08)",border:"1px solid rgba(16,185,129,0.2)",borderRadius:10,padding:"12px 14px",marginBottom:16}}><p style={{margin:0,fontSize:13,color:"#10b981"}}>✅ Encontrado: <strong>{eqResult.nome}</strong></p></div>
+              <div style={{marginBottom:16}}>
+                <label style={{display:"block",fontSize:11,fontWeight:700,color:"#64748b",marginBottom:6,textTransform:"uppercase",letterSpacing:"1px"}}>Nova senha</label>
+                <input type="password" style={{width:"100%",padding:"12px 16px",borderRadius:10,border:"1px solid rgba(184,151,90,0.15)",background:"rgba(255,255,255,0.03)",color:"#f0f9ff",fontSize:14,outline:"none",boxSizing:"border-box"}} placeholder="Nova senha" value={novaSenha} onChange={e=>setNovaSenha(e.target.value)} onKeyDown={e=>e.key==="Enter"&&resetarSenha()}/>
+              </div>
+              <button onClick={resetarSenha} style={{width:"100%",padding:"13px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#b8975a,#d4af6e)",color:"#fff",fontWeight:700,fontSize:14}}>💾 Salvar nova senha</button>
+            </>}
+          </>}
+          {lView==="resetado"&&<div style={{textAlign:"center",padding:"20px 0"}}>
+            <div style={{fontSize:56,marginBottom:14}}>✅</div>
+            <h2 style={{margin:"0 0 8px",color:"#10b981",fontWeight:800,fontSize:22}}>Senha atualizada!</h2>
+            <button onClick={()=>{setLView("login");setLErr("");}} style={{width:"100%",padding:"14px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#b8975a,#d4af6e)",color:"#fff",fontWeight:800,fontSize:15,marginTop:16}}>🔐 Ir para o login</button>
+          </div>}
+
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── APP ───────────────────────────────────────────────────────────────────
+  return(
+    <div style={{minHeight:"100vh",background:S.bg,fontFamily:"DM Sans,Segoe UI,sans-serif",color:S.text,display:"flex",flexDirection:"column",transition:"background 0.3s"}}>
+      {/* HEADER */}
+      <header style={{background:S.header,borderBottom:S.border,padding:"0 20px",display:"flex",alignItems:"center",height:64,position:"sticky",top:0,zIndex:100,boxShadow:"0 4px 20px rgba(0,0,0,0.1)"}}>
+        <img src={LOGO} alt="Logo" style={{height:42,objectFit:"contain"}}/>
+        <div style={{marginLeft:12,borderLeft:"1px solid #b8975a44",paddingLeft:12}}>
+          <div style={{fontSize:15,fontWeight:800,color:dark?"#f0f9ff":"#1e293b",letterSpacing:"-0.5px"}}>Lead Control²</div>
+          <div style={{fontSize:10,color:"#b8975a",textTransform:"uppercase",letterSpacing:"1px"}}>Pedro Quadrado Advocacia</div>
+        </div>
+        {retornarHoje.length>0&&<div style={{marginLeft:16,padding:"5px 12px",borderRadius:99,background:"#f59e0b22",border:"1px solid #f59e0b44",fontSize:12,color:"#f59e0b",fontWeight:700,cursor:"pointer"}} onClick={()=>setView("lista")}>📅 {retornarHoje.length} retorno{retornarHoje.length>1?"s":""} hoje</div>}
+        {semContato.length>0&&<div style={{marginLeft:8,padding:"5px 12px",borderRadius:99,background:"#ef444422",border:"1px solid #ef444444",fontSize:12,color:"#f87171",fontWeight:700}}>⚠️ {semContato.length} sem contato 7+ dias</div>}
+        <nav style={{marginLeft:"auto",display:"flex",gap:4,alignItems:"center"}}>
+          <div style={{position:"relative"}}>
+            <button onClick={()=>{setShowSearch(!showSearch);setGlobalSearch("");}} style={{width:34,height:34,borderRadius:8,border:S.border,background:"transparent",color:S.text2,cursor:"pointer",fontSize:16}}>🔍</button>
+            {showSearch&&<div style={{position:"absolute",right:0,top:40,background:dark?"#1e293b":"#fff",border:S.border,borderRadius:12,padding:12,width:300,zIndex:200,boxShadow:"0 8px 32px rgba(0,0,0,0.2)"}}>
+              <input autoFocus style={I} placeholder="Buscar lead..." value={globalSearch} onChange={e=>setGlobalSearch(e.target.value)}/>
+              {globalResults.length===0&&globalSearch.length>1&&<p style={{color:S.text2,fontSize:13,textAlign:"center",marginTop:8}}>Nenhum resultado</p>}
+              {globalResults.map(c=>(
+                <div key={c.id} onClick={()=>{doEdit(c);setShowSearch(false);}} style={{padding:"8px 10px",borderRadius:8,cursor:"pointer",marginTop:6,border:S.border}}>
+                  <div style={{fontWeight:700,fontSize:13,color:S.text}}>{c.nome}</div>
+                  <div style={{fontSize:11,color:S.text2}}>📱 {c.telefone} · {c.beneficio}</div>
+                </div>
+              ))}
+            </div>}
+          </div>
+          <button onClick={toggleTema} style={{width:34,height:34,borderRadius:8,border:S.border,background:"transparent",color:S.text2,cursor:"pointer",fontSize:16}} title={dark?"Modo claro":"Modo escuro"}>{dark?"☀️":"🌙"}</button>
+          {[["dashboard","📊"],["cadastro","➕"],["lista","📋"],...(session.role==="admin"?[["admin","⚙️"]]:[])]
+            .map(([id,label])=>(
+              <button key={id} onClick={()=>navTo(id)} style={{padding:"8px 12px",borderRadius:8,border:"none",cursor:"pointer",fontSize:16,background:view===id?"linear-gradient(135deg,#b8975a,#d4af6e)":"transparent",color:view===id?"#fff":S.text2}} title={id}>{label}</button>
+            ))}
+          <div style={{marginLeft:8,padding:"6px 12px",borderRadius:99,background:dark?"#1e293b":"#f0f4f8",border:S.border,fontSize:12,display:"flex",alignItems:"center",gap:6}}>
+            👤 <span style={{color:"#d4af6e",fontWeight:700}}>{session.nome}</span>
+            <button onClick={doLogout} style={{background:"none",border:"none",color:S.text2,cursor:"pointer",fontSize:11,padding:0,marginLeft:4}}>sair</button>
+          </div>
+        </nav>
+      </header>
+      <div style={{background:dark?"#0d1f36":"#e2e8f0",borderBottom:S.border,padding:"4px 24px",fontSize:11,color:dark?"#334155":"#94a3b8",display:"flex",alignItems:"center",gap:6}}>
+        <span style={{width:6,height:6,borderRadius:99,background:"#10b981",display:"inline-block",animation:"pulse 2s infinite"}}/>
+        Lead Control² · Dados compartilhados · Atualiza a cada 15s
+        {retornarHoje.length>0&&<span style={{marginLeft:12,color:"#f59e0b"}}>📅 {retornarHoje.length} lead(s) para retornar hoje!</span>}
+      </div>
+      {toast&&<div style={{position:"fixed",top:76,right:24,zIndex:999,padding:"12px 20px",borderRadius:10,fontWeight:600,fontSize:14,background:toast.type==="error"?"#ef4444":"#10b981",color:"#fff",animation:"fadeIn 0.3s ease",boxShadow:"0 8px 24px rgba(0,0,0,0.3)"}}>{toast.type==="error"?"❌":"✅"} {toast.msg}</div>}
+
+      <main style={{flex:1,padding:24,maxWidth:1300,margin:"0 auto",width:"100%",boxSizing:"border-box"}}>
+
+        {/* ── DASHBOARD ── */}
+        {view==="dashboard"&&<>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",flexWrap:"wrap",gap:12,marginBottom:24}}>
+            <div><h2 style={{margin:0,fontSize:22,fontWeight:800,color:dark?"#f0f9ff":S.text}}>📊 Dashboard</h2><p style={{margin:"4px 0 0",fontSize:13,color:S.text2}}>Visão geral dos leads</p></div>
+            <ExportBtn/>
+          </div>
+          {(retornarHoje.length>0||semContato.length>0)&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:12,marginBottom:20}}>
+            {retornarHoje.length>0&&<div style={{...C,border:"1px solid #f59e0b44",background:dark?"rgba(245,158,11,0.05)":"rgba(245,158,11,0.08)"}}>
+              <div style={{fontWeight:800,color:"#f59e0b",marginBottom:8}}>📅 Retornos de hoje ({retornarHoje.length})</div>
+              {retornarHoje.slice(0,3).map(c=><div key={c.id} style={{fontSize:13,color:S.text2,marginBottom:4}}>• {c.nome} — {c.telefone}</div>)}
+              {retornarHoje.length>3&&<div style={{fontSize:12,color:S.text2}}>+{retornarHoje.length-3} mais...</div>}
+            </div>}
+            {semContato.length>0&&<div style={{...C,border:"1px solid #ef444444",background:dark?"rgba(239,68,68,0.05)":"rgba(239,68,68,0.08)"}}>
+              <div style={{fontWeight:800,color:"#f87171",marginBottom:8}}>⚠️ Sem contato 7+ dias ({semContato.length})</div>
+              {semContato.slice(0,3).map(c=><div key={c.id} style={{fontSize:13,color:S.text2,marginBottom:4}}>• {c.nome} — {c.telefone}</div>)}
+              {semContato.length>3&&<div style={{fontSize:12,color:S.text2}}>+{semContato.length-3} mais...</div>}
+            </div>}
+          </div>}
+          <div style={{...C,marginBottom:24}}>
+            <div style={{fontSize:12,color:"#b8975a",fontWeight:700,marginBottom:12,textTransform:"uppercase"}}>🔍 Filtros</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(148px,1fr))",gap:12}}>
+              <DtIn label="Cadastro De" value={fIni} onChange={setFIni}/><DtIn label="Cadastro Até" value={fFim} onChange={setFFim}/>
+              <DtIn label="Fechamento De" value={fFIni} onChange={setFFIni}/><DtIn label="Fechamento Até" value={fFFim} onChange={setFFFim}/>
+              <div><Lbl t="Membro"/><select style={I} value={fMem} onChange={e=>setFMem(e.target.value)}><option value="">Todos</option>{members.map(m=><option key={m} value={m}>{m}</option>)}</select></div>
+              <div><Lbl t="Benefício"/><select style={I} value={fBen} onChange={e=>setFBen(e.target.value)}><option value="">Todos</option>{BENEFICIOS.map(b=><option key={b} value={b}>{b}</option>)}</select></div>
+              <div><Lbl t="Fechou?"/><select style={I} value={fFec} onChange={e=>setFFec(e.target.value)}><option value="">Todos</option><option>Sim</option><option>Não</option></select></div>
+              <div><Lbl t="Status"/><select style={I} value={fSta} onChange={e=>setFSta(e.target.value)}><option value="">Todos</option>{STATUS.map(s=><option key={s.v} value={s.v}>{s.l}</option>)}</select></div>
+            </div>
+            {filtersActive&&<button onClick={clearF} style={{...BS,marginTop:12}}>🗑️ Limpar filtros</button>}
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:16,marginBottom:24}}>
+            {[["👥","Total",stats.total,"#3b82f6"],["✅","Fechados",stats.fechados,"#10b981"],["❌","Não Fechados",stats.naoFechados,"#ef4444"],["⭐","Qualificados",stats.porSt["Qualificado"]||0,"#f59e0b"],["🚫","Desqualificados",stats.porSt["Desqualificado"]||0,"#ef4444"],["❓","Desconhecido",stats.porSt["Desconhecido"]||0,"#6b7280"]].map(([icon,label,value,color])=>(
+              <div key={label} style={{background:S.bg2,border:`1px solid ${color}33`,borderRadius:14,padding:20}}>
+                <div style={{fontSize:22,marginBottom:8}}>{icon}</div>
+                <div style={{fontSize:28,fontWeight:900,color,lineHeight:1}}>{value}</div>
+                <div style={{fontSize:11,color:S.text2,marginTop:4,fontWeight:600}}>{label}</div>
+              </div>
+            ))}
+            {stats.tempoMedio!==null&&<div style={{background:S.bg2,border:"1px solid #a78bfa33",borderRadius:14,padding:20}}>
+              <div style={{fontSize:22,marginBottom:8}}>⏱️</div>
+              <div style={{fontSize:28,fontWeight:900,color:"#a78bfa",lineHeight:1}}>{stats.tempoMedio}d</div>
+              <div style={{fontSize:11,color:S.text2,marginTop:4,fontWeight:600}}>Tempo médio p/ fechar</div>
+            </div>}
+          </div>
+          {/* Funil */}
+          <div style={{...C,marginBottom:20}}>
+            <div style={{fontSize:13,color:"#b8975a",fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>🔻 Funil de Vendas</div>
+            {[["Total de Leads",stats.funil.total,"#3b82f6"],["Qualificados",stats.funil.qualificados,"#f59e0b"],["Fechados",stats.funil.fechados,"#10b981"]].map(([label,val,color],i)=>{
+              const pct=stats.funil.total>0?(val/stats.funil.total*100).toFixed(0):0;
+              return(<div key={label} style={{marginBottom:10,width:(100-i*15)+"%"}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,color:S.text2}}>{label}</span><span style={{fontSize:12,fontWeight:700,color}}>{val} ({pct}%)</span></div>
+                <div style={{height:28,borderRadius:8,background:dark?"#1e293b":"#e2e8f0",overflow:"hidden"}}><div style={{height:"100%",borderRadius:8,width:pct+"%",background:color,opacity:0.8,transition:"width 1s ease"}}/></div>
+              </div>);
+            })}
+          </div>
+          {/* Taxa de conversão */}
+          <div style={{...C,marginBottom:20,border:"1px solid #b8975a33"}}>
+            <div style={{fontSize:13,color:"#b8975a",fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>📈 Taxa de Conversão</div>
+            {stats.total===0?<p style={{color:S.text2,fontSize:13}}>Sem dados no período.</p>:<>
+              <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:20}}>
+                <div style={{flex:1,height:18,borderRadius:99,background:dark?"#1e293b":"#e2e8f0",overflow:"hidden"}}><div style={{height:"100%",borderRadius:99,width:(stats.fechados/stats.total*100).toFixed(1)+"%",background:"linear-gradient(90deg,#10b981,#06b6d4)",transition:"width 1s ease"}}/></div>
+                <span style={{fontSize:28,fontWeight:900,color:"#10b981",minWidth:70}}>{(stats.fechados/stats.total*100).toFixed(1)}%</span>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+                {[["#10b981",stats.fechados,"Fechados"],["#ef4444",stats.naoFechados,"Não Fechados"],["#3b82f6",stats.total,"Total"]].map(([color,val,lbl])=>(
+                  <div key={lbl} style={{background:dark?"#0a1628":"#f0f4f8",borderRadius:10,padding:14,border:`1px solid ${color}33`,textAlign:"center"}}>
+                    <div style={{fontSize:24,fontWeight:900,color}}>{val}</div>
+                    <div style={{fontSize:12,color:S.text2,marginTop:2}}>{lbl}</div>
+                  </div>
+                ))}
+              </div>
+            </>}
+          </div>
+          {/* Meta mensal */}
+          <div style={{...C,marginBottom:20}}>
+            <div style={{fontSize:13,color:"#b8975a",fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>🎯 Meta Mensal</div>
+            <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
+              {session.role==="admin"&&<select style={{...I,maxWidth:180}} value={metaMembro} onChange={e=>setMetaMembro(e.target.value)}><option value="">Minha meta</option>{members.map(m=><option key={m} value={m}>{m}</option>)}</select>}
+              <input style={{...I,maxWidth:120}} type="number" min="1" placeholder="Meta (nº)" value={metaInput} onChange={e=>setMetaInput(e.target.value)}/>
+              <button onClick={saveMeta} style={{...BP,padding:"10px 18px"}}>💾 Salvar meta</button>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              {Object.entries(stats.porUser).map(([nome,total])=>{
+                const meta=metas[nome]||0,fech=stats.porUserF[nome]||0;
+                const taxa=total>0?(fech/total*100).toFixed(0):0;
+                const metaPct=meta>0?Math.min((fech/meta*100).toFixed(0),100):0;
+                return(<div key={nome} style={{background:dark?"#0a1628":"#f0f4f8",borderRadius:10,padding:14,border:S.border}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:8,flexWrap:"wrap",gap:4}}>
+                    <span style={{fontWeight:700,color:S.text}}>👤 {nome}</span>
+                    <div style={{display:"flex",gap:12,fontSize:12,color:S.text2}}>
+                      <span>Leads: <strong style={{color:S.text}}>{total}</strong></span>
+                      <span>Fechou: <strong style={{color:"#10b981"}}>{fech}</strong></span>
+                      <span>Conv: <strong style={{color:"#10b981"}}>{taxa}%</strong></span>
+                      {meta>0&&<span>Meta: <strong style={{color:"#b8975a"}}>{fech}/{meta}</strong></span>}
+                    </div>
+                  </div>
+                  {meta>0&&<div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <div style={{flex:1,height:10,borderRadius:99,background:dark?"#1e293b":"#e2e8f0",overflow:"hidden"}}><div style={{height:"100%",borderRadius:99,width:metaPct+"%",background:metaPct>=100?"#10b981":"linear-gradient(90deg,#b8975a,#d4af6e)",transition:"width 1s ease"}}/></div>
+                    <span style={{fontSize:12,fontWeight:700,color:metaPct>=100?"#10b981":"#b8975a",minWidth:36}}>{metaPct}%</span>
+                  </div>}
+                  {!meta&&<div style={{fontSize:12,color:S.text2,fontStyle:"italic"}}>Sem meta definida</div>}
+                </div>);
+              })}
+              {Object.keys(stats.porUser).length===0&&<p style={{color:S.text2,fontSize:13}}>Sem dados no período.</p>}
+            </div>
+          </div>
+          {/* Gráficos */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:16,marginBottom:16}}>
+            <div style={C}>
+              <div style={{fontSize:12,color:S.text2,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>📈 Evolução Mensal (6 meses)</div>
+              <div style={{display:"flex",alignItems:"flex-end",gap:8,height:120,marginBottom:8}}>
+                {stats.evolucao.map((m,i)=>{
+                  const maxVal=Math.max(...stats.evolucao.map(x=>Math.max(x.entradas,x.fechadosMes)),1);
+                  return(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
+                    <div style={{width:"100%",display:"flex",gap:2,alignItems:"flex-end",height:90}}>
+                      <div style={{flex:1,borderRadius:"4px 4px 0 0",background:"#3b82f6",height:Math.max((m.entradas/maxVal*90),2)+"px"}} title={`Entradas: ${m.entradas}`}/>
+                      <div style={{flex:1,borderRadius:"4px 4px 0 0",background:"#10b981",height:Math.max((m.fechadosMes/maxVal*90),2)+"px"}} title={`Fechados: ${m.fechadosMes}`}/>
+                    </div>
+                    <div style={{fontSize:9,color:S.text2,textAlign:"center"}}>{m.label}</div>
+                    <div style={{fontSize:9,color:"#3b82f6"}}>{m.entradas}</div>
+                    <div style={{fontSize:9,color:"#10b981"}}>{m.fechadosMes}</div>
+                  </div>);
+                })}
+              </div>
+              <div style={{display:"flex",gap:16}}>
+                <div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:10,height:10,borderRadius:2,background:"#3b82f6"}}/><span style={{fontSize:11,color:S.text2}}>Entradas</span></div>
+                <div style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:10,height:10,borderRadius:2,background:"#10b981"}}/><span style={{fontSize:11,color:S.text2}}>Fechamentos</span></div>
+              </div>
+            </div>
+            <div style={C}>
+              <div style={{fontSize:12,color:S.text2,fontWeight:700,marginBottom:14,textTransform:"uppercase"}}>⚖️ Taxa de Sucesso por Benefício</div>
+              {BENEFICIOS.map(b=>{const d=stats.taxaDeferimento&&stats.taxaDeferimento[b];if(!d||d.total===0)return null;return(
+                <div key={b} style={{marginBottom:10}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:11,color:S.text2}}>{b}</span><span style={{fontSize:11,fontWeight:700,color:d.taxa>=50?"#10b981":"#f87171"}}>{d.def}/{d.total} ({d.taxa}%)</span></div>
+                  <div style={{height:5,borderRadius:99,background:dark?"#1e293b":"#e2e8f0",overflow:"hidden"}}><div style={{height:"100%",borderRadius:99,width:d.taxa+"%",background:d.taxa>=50?"#10b981":"#f87171"}}/></div>
+                </div>
+              );})}
+              {(!stats.taxaDeferimento||BENEFICIOS.every(b=>!stats.taxaDeferimento[b]||stats.taxaDeferimento[b].total===0))&&<p style={{color:S.text2,fontSize:13}}>Sem dados suficientes.</p>}
+            </div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:16}}>
+            <div style={C}>
+              <div style={{fontSize:12,color:S.text2,fontWeight:700,marginBottom:14,textTransform:"uppercase"}}>Por Benefício</div>
+              {BENEFICIOS.map(b=>{const n=stats.porBen[b]||0,pct=stats.total?(n/stats.total*100):0;return(
+                <div key={b} style={{marginBottom:10}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,color:S.text2}}>{b}</span><span style={{fontSize:12,fontWeight:700,color:CORES[b]}}>{n}</span></div>
+                  <div style={{height:5,borderRadius:99,background:dark?"#1e293b":"#e2e8f0",overflow:"hidden"}}><div style={{height:"100%",borderRadius:99,width:pct+"%",background:CORES[b]}}/></div>
+                </div>
+              );})}
+            </div>
+          </div>
+        </>}
+
+        {/* ── CADASTRO ── */}
+        {view==="cadastro"&&<div style={{maxWidth:640,margin:"0 auto"}}>
+          <div style={{marginBottom:24}}><h2 style={{margin:0,fontSize:22,fontWeight:800,color:dark?"#f0f9ff":S.text}}>{editId?"✏️ Editar Cliente":"➕ Cadastrar Cliente"}</h2><p style={{margin:"4px 0 0",fontSize:13,color:S.text2}}>Dados visíveis para toda a equipe</p></div>
+          <div style={C}>
+            <Field label="Nome do Cliente *"><input style={I} placeholder="Ex: Maria Aparecida Silva" value={form.nome} onChange={e=>setForm({...form,nome:e.target.value})}/></Field>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+              <Field label="Telefone *"><input style={I} placeholder="(44) 99999-0000" value={form.telefone} onChange={e=>setForm({...form,telefone:fPhone(e.target.value)})}/></Field>
+              <Field label="CPF (opcional)"><input style={I} placeholder="000.000.000-00" value={form.cpf||""} onChange={e=>setForm({...form,cpf:fCPF(e.target.value)})}/></Field>
+            </div>
+            <Field label="Benefício Requerido *"><select style={I} value={form.beneficio} onChange={e=>setForm({...form,beneficio:e.target.value})}><option value="">Selecione...</option>{BENEFICIOS.map(b=><option key={b} value={b}>{b}</option>)}</select></Field>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+              <Field label="Data do Cadastro *"><input type="date" style={I} value={form.data} onChange={e=>setForm({...form,data:e.target.value})}/></Field>
+              <Field label="📅 Data de Retorno"><input type="date" style={I} value={form.dataRetorno||""} onChange={e=>setForm({...form,dataRetorno:e.target.value})}/></Field>
+            </div>
+            <Field label="Status do Lead *">
+              <div style={{display:"flex",gap:8}}>{STATUS.map(s=><button key={s.v} onClick={()=>setForm({...form,status:s.v})} style={{flex:1,padding:"11px 4px",borderRadius:10,cursor:"pointer",fontWeight:700,fontSize:12,border:"2px solid",transition:"all 0.2s",textAlign:"center",borderColor:form.status===s.v?s.c:"#1e3a5f",background:form.status===s.v?s.c+"22":"transparent",color:form.status===s.v?s.c:S.text2}}>{s.e} {s.l}</button>)}</div>
+            </Field>
+            <Field label="Fechou? *">
+              <div style={{display:"flex",gap:10}}>{["Sim","Não"].map(op=><button key={op} onClick={()=>setForm({...form,fechou:op,dataFechamento:op==="Não"?"":form.dataFechamento})} style={{flex:1,padding:12,borderRadius:10,cursor:"pointer",fontWeight:800,fontSize:15,border:"2px solid",transition:"all 0.2s",borderColor:form.fechou===op?(op==="Sim"?"#10b981":"#ef4444"):"#1e3a5f",background:form.fechou===op?(op==="Sim"?"rgba(16,185,129,0.12)":"rgba(239,68,68,0.12)"):"transparent",color:form.fechou===op?(op==="Sim"?"#10b981":"#ef4444"):S.text2}}>{op==="Sim"?"✅  Sim":"❌  Não"}</button>)}</div>
+            </Field>
+            {form.fechou==="Sim"&&<Field label="📅 Data do Fechamento"><input type="date" style={{...I,borderColor:"#10b98166"}} value={form.dataFechamento||""} onChange={e=>setForm({...form,dataFechamento:e.target.value})}/></Field>}
+            <Field label="Observações (opcional)">
+              <textarea style={{...I,minHeight:80,resize:"vertical",fontFamily:"inherit"}} placeholder="Anotações sobre o lead..." value={form.observacao||""} onChange={e=>setForm({...form,observacao:e.target.value})}></textarea>
+            </Field>
+            <div style={{borderTop:S.border,paddingTop:16,marginTop:4,marginBottom:16}}>
+              <div style={{fontSize:12,color:"#b8975a",fontWeight:700,marginBottom:12,textTransform:"uppercase"}}>⚖️ Dados do Processo</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+                <Field label="Nº Processo INSS"><input style={I} placeholder="ex: 1234567-89.2024" value={form.numInss||""} onChange={e=>setForm({...form,numInss:e.target.value})}/></Field>
+                <Field label="Nº Processo Judicial"><input style={I} placeholder="ex: 0001234-56.2024.4.03" value={form.numJudicial||""} onChange={e=>setForm({...form,numJudicial:e.target.value})}/></Field>
+              </div>
+              <Field label="Etapa do Processo">
+                <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+                  {ETAPAS.map(et=><button key={et.v} onClick={()=>setForm({...form,etapaProcesso:et.v})} style={{padding:"10px 4px",borderRadius:10,cursor:"pointer",fontWeight:700,fontSize:11,border:"2px solid",transition:"all 0.2s",textAlign:"center",borderColor:form.etapaProcesso===et.v?et.c:"#1e3a5f",background:form.etapaProcesso===et.v?et.c+"22":"transparent",color:form.etapaProcesso===et.v?et.c:S.text2}}>{et.e} {et.v}</button>)}
+                </div>
+              </Field>
+            </div>
+            <div style={{background:dark?"#0a1628":"#f0f4f8",border:S.border,borderRadius:8,padding:"10px 14px",fontSize:12,color:S.text2,marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span>👤 Cadastrado por: <strong style={{color:"#d4af6e"}}>{session?.nome}</strong></span>
+              {editId&&<button onClick={()=>abrirAgenda(form)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #10b98144",background:"rgba(16,185,129,0.08)",color:"#10b981",cursor:"pointer",fontWeight:600,fontSize:12}}>📅 Agendar no Google Agenda</button>}
+            </div>
+            <div style={{display:"flex",gap:12}}>
+              <button onClick={()=>submit(false)} style={{...BP,flex:1,padding:14,fontSize:15}}>{editId?"💾 Salvar Alterações":"✅ Cadastrar Cliente"}</button>
+              {editId&&<button onClick={()=>{setEditId(null);setForm({...FORM0,por:session?.nome||""});setView("lista");}} style={BS}>Cancelar</button>}
+            </div>
+          </div>
+        </div>}
+
+        {/* ── LISTA ── */}
+        {view==="lista"&&<div>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",flexWrap:"wrap",gap:12,marginBottom:24}}>
+            <div><h2 style={{margin:0,fontSize:22,fontWeight:800,color:dark?"#f0f9ff":S.text}}>📋 Clientes da Equipe</h2><p style={{margin:"4px 0 0",fontSize:13,color:S.text2}}>{rows.length} registro(s)</p></div>
+            <ExportBtn/>
+          </div>
+          <div style={{...C,marginBottom:20}}>
+            <div style={{fontSize:12,color:"#b8975a",fontWeight:700,marginBottom:12,textTransform:"uppercase"}}>🔍 Filtros</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12}}>
+              <div style={{gridColumn:"span 2"}}><Lbl t="Buscar nome / telefone / CPF"/><input style={I} placeholder="Digite..." value={search} onChange={e=>setSearch(e.target.value)}/></div>
+              <DtIn label="Cadastro De" value={fIni} onChange={setFIni}/><DtIn label="Cadastro Até" value={fFim} onChange={setFFim}/>
+              <DtIn label="Fechamento De" value={fFIni} onChange={setFFIni}/><DtIn label="Fechamento Até" value={fFFim} onChange={setFFFim}/>
+              <div><Lbl t="Membro"/><select style={I} value={fMem} onChange={e=>setFMem(e.target.value)}><option value="">Todos</option>{members.map(m=><option key={m} value={m}>{m}</option>)}</select></div>
+              <div><Lbl t="Benefício"/><select style={I} value={fBen} onChange={e=>setFBen(e.target.value)}><option value="">Todos</option>{BENEFICIOS.map(b=><option key={b} value={b}>{b}</option>)}</select></div>
+              <div><Lbl t="Fechou?"/><select style={I} value={fFec} onChange={e=>setFFec(e.target.value)}><option value="">Todos</option><option>Sim</option><option>Não</option></select></div>
+              <div><Lbl t="Status"/><select style={I} value={fSta} onChange={e=>setFSta(e.target.value)}><option value="">Todos</option>{STATUS.map(s=><option key={s.v} value={s.v}>{s.l}</option>)}</select></div>
+              <div><Lbl t="Etapa do Processo"/><select style={I} value={fEtapa} onChange={e=>setFEtapa(e.target.value)}><option value="">Todas</option>{ETAPAS.map(e=><option key={e.v} value={e.v}>{e.v}</option>)}</select></div>
+            </div>
+            {filtersActive&&<button onClick={clearF} style={{...BS,marginTop:12}}>🗑️ Limpar filtros</button>}
+          </div>
+          {rows.length===0?(
+            <div style={{...C,textAlign:"center",padding:48}}><div style={{fontSize:48}}>📭</div><p style={{color:S.text2,fontWeight:600}}>Nenhum cliente encontrado</p><button onClick={()=>navTo("cadastro")} style={{...BP,marginTop:16}}>➕ Cadastrar</button></div>
+          ):rows.map(c=>{
+            const sI=STATUS.find(s=>s.v===c.status);
+            const telDup=rows.filter(x=>x.id!==c.id&&(x.telefone||"").replace(/\D/g,"")!==""&&(x.telefone||"").replace(/\D/g,"")===(c.telefone||"").replace(/\D/g,"")).length>0;
+            const retornaHj=c.dataRetorno===hoje();
+            const diasSem=c.dataRetorno||c.data?diasEntre(c.dataRetorno||c.data,hoje()):0;
+            const alertaSem=diasSem>=7&&c.fechou!=="Sim";
+            return(
+              <div key={c.id} style={{...C,display:"flex",alignItems:"flex-start",gap:16,padding:"16px 20px",marginBottom:10,borderLeft:`4px solid ${c.eventoAgenda?"#4285f4":CORES[c.beneficio]||"#3b82f6"}`,border:retornaHj?"2px solid #f59e0b":alertaSem?"2px solid #ef444444":S.border}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
+                    <span style={{fontWeight:800,fontSize:15,color:dark?"#f0f9ff":S.text}}>{c.nome}</span>
+                    <span style={{fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:99,background:(CORES[c.beneficio]||"#60a5fa")+"22",color:CORES[c.beneficio]||"#60a5fa",border:`1px solid ${CORES[c.beneficio]||"#60a5fa"}44`}}>{c.beneficio}</span>
+                    {telDup&&<span style={{fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:99,background:"#f59e0b22",color:"#f59e0b",border:"1px solid #f59e0b66"}}>⚠️ Tel. duplicado</span>}
+                    {retornaHj&&<span style={{fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:99,background:"#f59e0b22",color:"#f59e0b",border:"1px solid #f59e0b66"}}>📅 Retornar hoje!</span>}
+                    {alertaSem&&<span style={{fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:99,background:"#ef444422",color:"#f87171",border:"1px solid #ef444466"}}>⏰ {diasSem}d sem contato</span>}
+                  </div>
+                  <div style={{display:"flex",gap:14,flexWrap:"wrap",marginBottom:4}}>
+                    <span style={{fontSize:12,color:S.text2}}>📱 {c.telefone}</span>
+                    {c.cpf&&<span style={{fontSize:12,color:S.text2}}>🪪 {c.cpf}</span>}
+                    <span style={{fontSize:12,color:S.text2}}>📅 Cadastro: {fmtDate(c.data)}</span>
+                    {c.dataFechamento&&<span style={{fontSize:12,color:"#10b981",fontWeight:700}}>✅ Fechou: {fmtDate(c.dataFechamento)}</span>}
+                    {c.dataRetorno&&<span style={{fontSize:12,color:"#f59e0b"}}>🔁 Retorno: {fmtDate(c.dataRetorno)}</span>}
+                    {c.por&&<span style={{fontSize:12,color:"#b8975a"}}>👤 {c.por}</span>}
+                  </div>
+                  {c.observacao&&<div style={{fontSize:12,color:S.text2,fontStyle:"italic",marginBottom:4}}>💬 {c.observacao}</div>}
+                  {(c.etapaProcesso||c.numInss||c.numJudicial)&&<div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:4}}>
+                    {c.etapaProcesso&&(()=>{const et=ETAPAS.find(e=>e.v===c.etapaProcesso);return et?<span style={{fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:99,background:et.c+"22",color:et.c,border:`1px solid ${et.c}44`}}>{et.e} {et.v}</span>:null;})()}
+                    {c.numInss&&<span style={{fontSize:11,color:S.text2}}>📋 INSS: {c.numInss}</span>}
+                    {c.numJudicial&&<span style={{fontSize:11,color:S.text2}}>⚖️ Jud: {c.numJudicial}</span>}
+                  </div>}
+                  {c.historico&&c.historico.length>0&&<div style={{fontSize:11,color:S.text2}}>🕐 Última alteração: {new Date(c.historico[c.historico.length-1].quando).toLocaleString("pt-BR")} por {c.historico[c.historico.length-1].por}</div>}
+                  {c.eventoAgenda&&<div style={{marginTop:10,padding:"10px 14px",borderRadius:10,background:"linear-gradient(135deg,rgba(66,133,244,0.12),rgba(52,168,83,0.08))",border:"1px solid rgba(66,133,244,0.35)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,flexWrap:"wrap"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10}}>
+                      <div style={{width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,#4285f4,#34a853)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>📅</div>
+                      <div>
+                        <div style={{fontSize:12,fontWeight:800,color:"#4285f4"}}>Agendado no Google Agenda</div>
+                        <div style={{fontSize:11,color:dark?"#94a3b8":"#64748b"}}>{c.eventoAgenda.titulo} · {fmtDate(c.eventoAgenda.data)} às {c.eventoAgenda.hora}h</div>
+                      </div>
+                    </div>
+                    <div style={{display:"flex",gap:6}}>
+                      {c.eventoAgenda.link&&<a href={c.eventoAgenda.link} target="_blank" rel="noreferrer" style={{padding:"5px 10px",borderRadius:7,background:"rgba(66,133,244,0.15)",color:"#4285f4",fontSize:11,fontWeight:700,textDecoration:"none",border:"1px solid rgba(66,133,244,0.3)"}}>🔗 Ver</a>}
+                      <button onClick={async(e)=>{e.stopPropagation();await deletarAgendamento(c.id,c.eventoAgenda);}} style={{padding:"5px 10px",borderRadius:7,background:"rgba(239,68,68,0.1)",color:"#f87171",fontSize:11,fontWeight:700,border:"1px solid rgba(239,68,68,0.3)",cursor:"pointer"}}>🗑️ Excluir</button>
+                    </div>
+                  </div>}
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"flex-end"}}>
+                  <Badge text={c.fechou==="Sim"?"✅ Fechou":"❌ Não Fechou"} color={c.fechou==="Sim"?"#10b981":"#ef4444"}/>
+                  {sI&&<Badge text={sI.e+" "+sI.l} color={sI.c}/>}
+                </div>
+                <div style={{display:"flex",gap:8}}>
+                  <button onClick={()=>abrirAgenda(c)} title="Agendar" style={{width:34,height:34,borderRadius:8,border:S.border,background:"transparent",color:"#10b981",cursor:"pointer",fontSize:14}}>📅</button>
+                  <button onClick={()=>{setAnotaModal(c);setAnotaTexto("");}} title="Anotações" style={{width:34,height:34,borderRadius:8,border:S.border,background:"transparent",color:"#a78bfa",cursor:"pointer",fontSize:14,position:"relative"}}>
+                    💬{c.anotacoes&&c.anotacoes.length>0&&<span style={{position:"absolute",top:-4,right:-4,background:"#a78bfa",color:"#fff",fontSize:9,fontWeight:800,width:14,height:14,borderRadius:99,display:"flex",alignItems:"center",justifyContent:"center"}}>{c.anotacoes.length}</span>}
+                  </button>
+                  <button onClick={()=>doEdit(c)} style={{width:34,height:34,borderRadius:8,border:S.border,background:"transparent",color:"#60a5fa",cursor:"pointer",fontSize:14}}>✏️</button>
+                  {session?.role==="admin"&&<button onClick={()=>setDelId(c.id)} style={{width:34,height:34,borderRadius:8,border:"1px solid #ef444433",background:"transparent",color:"#f87171",cursor:"pointer",fontSize:14}}>🗑️</button>}
+                </div>
+              </div>
+            );
+          })}
+        </div>}
+
+        {/* ── ADMIN ── */}
+        {view==="admin"&&session?.role==="admin"&&<div>
+          <div style={{marginBottom:24}}><h2 style={{margin:0,fontSize:22,fontWeight:800,color:dark?"#f0f9ff":S.text}}>⚙️ Painel Admin</h2></div>
+          <div style={{display:"flex",gap:8,marginBottom:20,flexWrap:"wrap"}}>
+            {[["usuarios","👥 Usuários"],["novo","➕ Novo Usuário"],["logs","🕐 Log de Acesso"],["backup","💾 Backup"]].map(([t,l])=>(
+              <button key={t} onClick={()=>setAdminTab(t)} style={{padding:"8px 16px",borderRadius:8,border:"none",cursor:"pointer",fontWeight:600,fontSize:13,background:adminTab===t?"linear-gradient(135deg,#b8975a,#d4af6e)":"#1e293b",color:adminTab===t?"#fff":S.text2}}>{l}</button>
+            ))}
+          </div>
+          {adminTab==="usuarios"&&<div style={C}>
+            {allUsers().map(u=>(
+              <div key={u.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 0",borderBottom:S.border,flexWrap:"wrap",gap:8}}>
+                <div><div style={{fontWeight:700,color:dark?"#f0f9ff":S.text}}>{u.nome}</div><div style={{fontSize:12,color:S.text2}}>@{u.usuario} · <span style={{color:u.role==="admin"?"#d4af6e":"#60a5fa"}}>{u.role}</span></div></div>
+                <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                  <span style={{fontSize:11,padding:"3px 10px",borderRadius:99,background:dark?"#0a1628":"#f0f4f8",color:S.text2,border:S.border}}>senha: {u.senha}</span>
+                  <button onClick={()=>{setEditUser({...u});setAdminTab("editar");}} style={{padding:"6px 12px",borderRadius:8,border:S.border,background:"transparent",color:"#60a5fa",cursor:"pointer",fontSize:12,fontWeight:600}}>✏️ Editar</button>
+                  {u.id!==session.id&&<button onClick={()=>removeUser(u.id)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #ef444433",background:"transparent",color:"#f87171",cursor:"pointer",fontSize:12,fontWeight:600}}>🗑️ Remover</button>}
+                </div>
+              </div>
+            ))}
+          </div>}
+          {adminTab==="editar"&&editUser&&<div style={{...C,maxWidth:480}}>
+            <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
+              <button onClick={()=>{setEditUser(null);setAdminTab("usuarios");}} style={{background:"none",border:"none",color:S.text2,cursor:"pointer",fontSize:13,padding:0}}>← Voltar</button>
+              <div style={{fontSize:13,color:S.text2}}>Editando: <strong style={{color:dark?"#f0f9ff":S.text}}>{editUser.nome}</strong></div>
+            </div>
+            <Field label="Nome completo"><input style={I} value={editUser.nome} onChange={e=>setEditUser({...editUser,nome:e.target.value})}/></Field>
+            <Field label="Usuário (login)"><input style={I} value={editUser.usuario} onChange={e=>setEditUser({...editUser,usuario:e.target.value.toLowerCase().replace(/[ ]/g,"")})}/></Field>
+            <Field label="Senha (deixe em branco para não alterar)"><input style={I} placeholder="Nova senha (opcional)" value={editUser.novaSenhaEdit||""} onChange={e=>setEditUser({...editUser,novaSenhaEdit:e.target.value})}/></Field>
+            <Field label="Perfil">
+              <div style={{display:"flex",gap:8}}>
+                {[["membro","👤 Membro"],["admin","⚙️ Admin"]].map(([r,l])=>(
+                  <button key={r} onClick={()=>setEditUser({...editUser,role:r})} style={{flex:1,padding:10,borderRadius:10,border:"2px solid",cursor:"pointer",fontWeight:700,fontSize:13,borderColor:editUser.role===r?"#b8975a":"#1e3a5f",background:editUser.role===r?"rgba(184,151,90,0.12)":"transparent",color:editUser.role===r?"#d4af6e":S.text2}}>{l}</button>
+                ))}
+              </div>
+            </Field>
+            <div style={{display:"flex",gap:10}}>
+              <button onClick={()=>{setEditUser(null);setAdminTab("usuarios");}} style={{...BS,flex:1}}>Cancelar</button>
+              <button onClick={()=>saveEditUser(editUser)} style={{...BP,flex:2,padding:13}}>💾 Salvar alterações</button>
+            </div>
+          </div>}
+          {adminTab==="novo"&&<div style={{...C,maxWidth:480}}>
+            <Field label="Nome completo"><input style={I} placeholder="João Silva" value={newUser.nome} onChange={e=>setNewUser({...newUser,nome:e.target.value})}/></Field>
+            <Field label="Usuário (login)"><input style={I} placeholder="joao.silva" value={newUser.usuario} onChange={e=>setNewUser({...newUser,usuario:e.target.value.toLowerCase().replace(/[ ]/g,"")})}/></Field>
+            <Field label="Senha"><input style={I} placeholder="Mínimo 4 caracteres" value={newUser.senha} onChange={e=>setNewUser({...newUser,senha:e.target.value})}/></Field>
+            <Field label="Perfil">
+              <div style={{display:"flex",gap:8}}>
+                {[["membro","👤 Membro"],["admin","⚙️ Admin"]].map(([r,l])=>(
+                  <button key={r} onClick={()=>setNewUser({...newUser,role:r})} style={{flex:1,padding:10,borderRadius:10,border:"2px solid",cursor:"pointer",fontWeight:700,fontSize:13,borderColor:newUser.role===r?"#b8975a":"#1e3a5f",background:newUser.role===r?"rgba(184,151,90,0.12)":"transparent",color:newUser.role===r?"#d4af6e":S.text2}}>{l}</button>
+                ))}
+              </div>
+            </Field>
+            <button onClick={addUser} style={{...BP,width:"100%",padding:14}}>✅ Criar Usuário</button>
+          </div>}
+          {adminTab==="logs"&&<div style={C}>
+            <div style={{fontSize:12,color:S.text2,fontWeight:700,marginBottom:16,textTransform:"uppercase"}}>🕐 Log de Acessos ({logs.length})</div>
+            {logs.length===0&&<p style={{color:S.text2,fontSize:13}}>Nenhum acesso registrado.</p>}
+            {logs.slice(0,50).map((l,i)=>(
+              <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:S.border,flexWrap:"wrap",gap:6}}>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  <span style={{fontSize:20}}>🔐</span>
+                  <div><div style={{fontWeight:700,fontSize:13,color:dark?"#f0f9ff":S.text}}>{l.usuario}</div><div style={{fontSize:12,color:S.text2}}>{l.acao}</div></div>
+                </div>
+                <div style={{fontSize:12,color:S.text2}}>{new Date(l.quando).toLocaleString("pt-BR")}</div>
+              </div>
+            ))}
+          </div>}
+          {adminTab==="backup"&&<div style={{...C,maxWidth:520}}>
+            <div style={{fontSize:12,color:S.text2,fontWeight:700,marginBottom:20,textTransform:"uppercase"}}>💾 Backup dos Dados</div>
+            <div style={{...C,marginBottom:16,border:"1px solid #10b98133"}}>
+              <div style={{fontWeight:700,color:"#10b981",marginBottom:8,fontSize:15}}>📤 Exportar Backup</div>
+              <p style={{color:S.text2,fontSize:13,marginBottom:16}}>Exporta todos os clientes, usuários e metas em JSON.</p>
+              <div style={{display:"flex",gap:10,fontSize:12,color:S.text2,marginBottom:16}}><span>👥 {db.length} clientes</span><span>👤 {allUsers().length} usuários</span></div>
+              <button onClick={exportarBackup} style={{...BP,width:"100%",padding:13,background:"linear-gradient(135deg,#10b981,#06b6d4)"}}>📥 Baixar Backup JSON</button>
+            </div>
+            <div style={{...C,border:"1px solid #f59e0b33"}}>
+              <div style={{fontWeight:700,color:"#f59e0b",marginBottom:8,fontSize:15}}>📥 Importar Backup</div>
+              <p style={{color:S.text2,fontSize:13,marginBottom:8}}><strong style={{color:"#f87171"}}>Atenção: substitui todos os dados atuais!</strong></p>
+              <label style={{display:"block",padding:"12px",borderRadius:10,border:"2px dashed #f59e0b44",textAlign:"center",cursor:"pointer",color:"#f59e0b",fontWeight:700,fontSize:14}}>
+                📂 Selecionar arquivo .json
+                <input type="file" accept=".json" style={{display:"none"}} onChange={importarBackup}/>
+              </label>
+            </div>
+          </div>}
+        </div>}
+      </main>
+
+      {/* Botão flutuante */}
+      {view!=="cadastro"&&<button onClick={()=>navTo("cadastro")} style={{position:"fixed",bottom:28,right:28,width:56,height:56,borderRadius:99,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#b8975a,#d4af6e)",color:"#fff",fontSize:26,fontWeight:900,boxShadow:"0 4px 20px rgba(184,151,90,0.5)",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center"}} title="Cadastrar novo lead">➕</button>}
+
+      {/* MODAL DUPLICATA */}
+      {dupModal&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300,padding:16}}>
+        <div style={{...C,maxWidth:560,width:"100%",maxHeight:"88vh",overflowY:"auto"}}>
+          <div style={{textAlign:"center",fontSize:36,marginBottom:8}}>⚠️</div>
+          <h3 style={{margin:"0 0 6px",textAlign:"center",color:"#fbbf24",fontSize:18}}>Possível Lead Duplicado!</h3>
+          <p style={{textAlign:"center",color:S.text2,fontSize:13,marginBottom:20}}>Encontramos {dupModal.length} registro(s) com nome ou CPF parecido.</p>
+          {dupModal.map(c=>{const sI=STATUS.find(s=>s.v===c.status);return(
+            <div key={c.id} style={{background:dark?"#0a1628":"#f0f4f8",border:"1px solid #fbbf2444",borderRadius:12,padding:16,marginBottom:12}}>
+              <div style={{fontWeight:800,fontSize:15,color:dark?"#f0f9ff":S.text,marginBottom:6}}>{c.nome}</div>
+              <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:6}}>
+                <span style={{fontSize:12,color:S.text2}}>📱 {c.telefone}</span>
+                {c.cpf&&<span style={{fontSize:12,color:S.text2}}>🪪 {c.cpf}</span>}
+                <span style={{fontSize:12,color:S.text2}}>📅 {fmtDate(c.data)}</span>
+                {c.por&&<span style={{fontSize:12,color:"#b8975a"}}>👤 {c.por}</span>}
+              </div>
+              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                <Badge text={c.fechou==="Sim"?"✅ Fechou":"❌ Não Fechou"} color={c.fechou==="Sim"?"#10b981":"#ef4444"}/>
+                {sI&&<Badge text={sI.e+" "+sI.l} color={sI.c}/>}
+              </div>
+              <button onClick={()=>setViewRec(c)} style={{marginTop:10,width:"100%",padding:8,borderRadius:8,border:S.border,background:"transparent",color:"#60a5fa",cursor:"pointer",fontWeight:600,fontSize:12}}>👁️ Ver cadastro</button>
+            </div>
+          );})}
+          <div style={{display:"flex",gap:10,marginTop:8}}>
+            <button onClick={()=>setDupModal(null)} style={{...BS,flex:1}}>← Voltar</button>
+            <button onClick={()=>submit(true)} style={{flex:1,padding:12,borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#f59e0b,#ef4444)",color:"#fff",fontWeight:700,fontSize:13}}>⚠️ Cadastrar mesmo assim</button>
+          </div>
+        </div>
+      </div>}
+
+      {/* MODAL VER REGISTRO */}
+      {viewRec&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.9)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:400,padding:16}}>
+        <div style={{...C,maxWidth:480,width:"100%",maxHeight:"90vh",overflowY:"auto"}}>
+          <h3 style={{margin:"0 0 16px",color:dark?"#f0f9ff":S.text}}>📋 Cadastro Existente</h3>
+          <RowInfo label="Nome" value={viewRec.nome}/><RowInfo label="Telefone" value={viewRec.telefone}/>
+          {viewRec.cpf&&<RowInfo label="CPF" value={viewRec.cpf}/>}
+          <RowInfo label="Benefício" value={viewRec.beneficio}/>
+          {viewRec.dataFechamento&&<RowInfo label="Data Fechamento" value={fmtDate(viewRec.dataFechamento)}/>}
+          {viewRec.dataRetorno&&<RowInfo label="Data Retorno" value={fmtDate(viewRec.dataRetorno)}/>}
+          <RowInfo label="Fechou?" value={viewRec.fechou}/><RowInfo label="Status" value={viewRec.status}/>
+          {viewRec.etapaProcesso&&<RowInfo label="Etapa" value={viewRec.etapaProcesso}/>}
+          {viewRec.numInss&&<RowInfo label="Nº INSS" value={viewRec.numInss}/>}
+          {viewRec.numJudicial&&<RowInfo label="Nº Judicial" value={viewRec.numJudicial}/>}
+          {viewRec.observacao&&<RowInfo label="Observações" value={viewRec.observacao}/>}
+          {viewRec.por&&<RowInfo label="Cadastrado por" value={viewRec.por}/>}
+          {viewRec.historico&&viewRec.historico.length>0&&<>
+            <div style={{fontSize:12,color:S.text2,fontWeight:700,margin:"12px 0 6px",textTransform:"uppercase"}}>Histórico</div>
+            {viewRec.historico.map((h,i)=><div key={i} style={{fontSize:12,color:S.text2,marginBottom:4}}>🕐 {new Date(h.quando).toLocaleString("pt-BR")} — {h.acao} por {h.por}</div>)}
+          </>}
+          <div style={{display:"flex",gap:10,marginTop:16}}>
+            <button onClick={()=>setViewRec(null)} style={{...BS,flex:1}}>Fechar</button>
+            <button onClick={()=>{setViewRec(null);doEdit(viewRec);setDupModal(null);}} style={{...BP,flex:1}}>✏️ Editar</button>
+          </div>
+        </div>
+      </div>}
+
+      {/* MODAL DELETE */}
+      {delId&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.75)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:200}}>
+        <div style={{...C,maxWidth:360,width:"90%",textAlign:"center"}}>
+          <div style={{fontSize:40,marginBottom:12}}>⚠️</div>
+          <div style={{fontWeight:800,fontSize:18,marginBottom:8,color:dark?"#f0f9ff":S.text}}>Remover cliente?</div>
+          <div style={{color:S.text2,fontSize:14,marginBottom:24}}>Esta ação remove para toda a equipe.</div>
+          <div style={{display:"flex",gap:12}}>
+            <button onClick={()=>setDelId(null)} style={{...BS,flex:1}}>Cancelar</button>
+            <button onClick={()=>doDelete(delId)} style={{flex:1,padding:12,borderRadius:10,border:"none",cursor:"pointer",background:"#ef4444",color:"#fff",fontWeight:700}}>Remover</button>
+          </div>
+        </div>
+      </div>}
+
+      {/* MODAL GOOGLE AGENDA */}
+      {agendaModal&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:460,padding:16}}>
+        <div style={{background:dark?"#1e293b":"#fff",borderRadius:16,width:"100%",maxWidth:580,maxHeight:"95vh",overflowY:"auto",boxShadow:"0 24px 64px rgba(0,0,0,0.5)"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px",borderBottom:dark?"1px solid #1e3a5f":"1px solid #e2e8f0"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,#4285f4,#34a853)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>📅</div>
+              <div>
+                <div style={{fontWeight:700,fontSize:15,color:dark?"#f0f9ff":"#1e293b"}}>Novo evento — Google Agenda</div>
+                <div style={{fontSize:12,color:"#64748b"}}>Lead: {agendaModal.nome}</div>
+              </div>
+            </div>
+            <button onClick={()=>{setAgendaModal(null);setAgendaSaved(null);}} style={{background:"none",border:"none",color:"#64748b",cursor:"pointer",fontSize:22}}>✕</button>
+          </div>
+          {agendaSaved?(
+            <div style={{padding:32,textAlign:"center"}}>
+              {agendaSaved.existente?<>
+                <div style={{fontSize:48,marginBottom:12}}>📅</div>
+                <h3 style={{margin:"0 0 4px",color:"#10b981",fontWeight:800,fontSize:20}}>Evento já agendado</h3>
+                <p style={{color:"#64748b",fontSize:13,marginBottom:20}}>{agendaModal.nome}</p>
+                <div style={{background:dark?"#0a1628":"#f0f4f8",border:"1px solid #10b98133",borderRadius:12,padding:16,marginBottom:20,textAlign:"left"}}>
+                  <div style={{fontSize:13,fontWeight:700,color:dark?"#f0f9ff":"#1e293b",marginBottom:8}}>📋 {agendaSaved.evento.titulo}</div>
+                  <div style={{fontSize:12,color:"#64748b"}}>📅 {fmtDate(agendaSaved.evento.data)} às {agendaSaved.evento.hora}h</div>
+                  <div style={{fontSize:11,color:"#475569",marginTop:4}}>Criado em {agendaSaved.evento.criadoEm?new Date(agendaSaved.evento.criadoEm).toLocaleString("pt-BR"):"-"}</div>
+                </div>
+                <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+                  {agendaSaved.link&&<a href={agendaSaved.link} target="_blank" rel="noreferrer" style={{padding:"11px 18px",borderRadius:10,background:"linear-gradient(135deg,#4285f4,#34a853)",color:"#fff",fontWeight:700,fontSize:14,textDecoration:"none"}}>🔗 Abrir no Google Agenda</a>}
+                  <button onClick={async()=>{await deletarAgendamento(agendaModal.id,agendaSaved.evento);setAgendaSaved(null);setAgendaModal(null);}} style={{padding:"11px 18px",borderRadius:10,border:"1px solid #ef444433",background:"transparent",color:"#f87171",cursor:"pointer",fontWeight:600,fontSize:13}}>🗑️ Excluir agendamento</button>
+                </div>
+                <button onClick={()=>setAgendaSaved(null)} style={{marginTop:12,background:"none",border:"none",color:"#64748b",cursor:"pointer",fontSize:13,textDecoration:"underline"}}>+ Criar novo agendamento</button>
+              </>:<>
+                <div style={{fontSize:56,marginBottom:16}}>🎉</div>
+                <h3 style={{margin:"0 0 8px",color:"#10b981",fontWeight:800,fontSize:20}}>Evento criado!</h3>
+                <p style={{color:"#64748b",fontSize:13,marginBottom:24}}>O evento foi adicionado ao seu Google Agenda.</p>
+                {agendaSaved.link&&<a href={agendaSaved.link} target="_blank" rel="noreferrer" style={{display:"inline-flex",alignItems:"center",gap:8,padding:"12px 20px",borderRadius:10,background:"linear-gradient(135deg,#4285f4,#34a853)",color:"#fff",fontWeight:700,fontSize:14,textDecoration:"none",marginBottom:16}}>🔗 Abrir no Google Agenda</a>}
+              </>}
+              <div><button onClick={()=>{setAgendaModal(null);setAgendaSaved(null);}} style={{...BS,marginTop:8}}>Fechar</button></div>
+            </div>
+          ):(
+            <div style={{padding:20}}>
+              <input style={{width:"100%",padding:"12px 4px",fontSize:22,fontWeight:700,border:"none",borderBottom:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",background:"transparent",color:dark?"#f0f9ff":"#1e293b",outline:"none",marginBottom:20,boxSizing:"border-box"}} placeholder="Adicionar título" value={agendaForm.titulo} onChange={e=>setAgendaForm({...agendaForm,titulo:e.target.value})}/>
+              <div style={{display:"flex",gap:12,marginBottom:16,alignItems:"center",flexWrap:"wrap"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:18}}>🕐</span><input type="date" style={{padding:"8px 12px",borderRadius:8,border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",background:dark?"#0a1628":"#f8fafc",color:dark?"#e2e8f0":"#1e293b",fontSize:14,outline:"none"}} value={agendaForm.data} onChange={e=>setAgendaForm({...agendaForm,data:e.target.value})}/></div>
+                <div style={{display:"flex",alignItems:"center",gap:6}}>
+                  <input type="time" style={{padding:"8px 10px",borderRadius:8,border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",background:dark?"#0a1628":"#f8fafc",color:dark?"#e2e8f0":"#1e293b",fontSize:14,outline:"none"}} value={agendaForm.horaIni} onChange={e=>setAgendaForm({...agendaForm,horaIni:e.target.value})}/>
+                  <span style={{color:"#64748b"}}>–</span>
+                  <input type="time" style={{padding:"8px 10px",borderRadius:8,border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",background:dark?"#0a1628":"#f8fafc",color:dark?"#e2e8f0":"#1e293b",fontSize:14,outline:"none"}} value={agendaForm.horaFim} onChange={e=>setAgendaForm({...agendaForm,horaFim:e.target.value})}/>
+                </div>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,padding:"10px 14px",borderRadius:10,border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",cursor:"pointer",background:agendaForm.meet?"rgba(66,133,244,0.08)":"transparent"}} onClick={()=>setAgendaForm({...agendaForm,meet:!agendaForm.meet})}>
+                <div style={{width:20,height:20,borderRadius:4,border:agendaForm.meet?"none":"2px solid #64748b",background:agendaForm.meet?"#4285f4":"transparent",display:"flex",alignItems:"center",justifyContent:"center"}}>{agendaForm.meet&&<span style={{color:"#fff",fontSize:13,fontWeight:900}}>✓</span>}</div>
+                <span style={{fontSize:13,color:dark?"#e2e8f0":"#1e293b",fontWeight:agendaForm.meet?700:400}}>📹 Adicionar videochamada Google Meet</span>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}><span style={{fontSize:18,flexShrink:0}}>📍</span><input style={{flex:1,padding:"10px 12px",borderRadius:8,border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",background:dark?"#0a1628":"#f8fafc",color:dark?"#e2e8f0":"#1e293b",fontSize:14,outline:"none"}} placeholder="Adicionar local" value={agendaForm.local} onChange={e=>setAgendaForm({...agendaForm,local:e.target.value})}/></div>
+              <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:16}}>
+                <span style={{fontSize:18,flexShrink:0,marginTop:10}}>👥</span>
+                <div style={{flex:1}}>
+                  <textarea style={{width:"100%",padding:"10px 12px",borderRadius:8,border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",background:dark?"#0a1628":"#f8fafc",color:dark?"#e2e8f0":"#1e293b",fontSize:14,outline:"none",resize:"vertical",minHeight:70,fontFamily:"inherit",boxSizing:"border-box"}} placeholder="Adicionar convidados (e-mails separados por vírgula)" value={agendaForm.convidados} onChange={e=>setAgendaForm({...agendaForm,convidados:e.target.value})}></textarea>
+                  <div style={{fontSize:11,color:"#64748b",marginTop:4}}>Ex: joao@email.com, maria@email.com</div>
+                </div>
+              </div>
+              <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:16}}><span style={{fontSize:18,flexShrink:0,marginTop:10}}>📝</span><textarea style={{flex:1,padding:"10px 12px",borderRadius:8,border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",background:dark?"#0a1628":"#f8fafc",color:dark?"#e2e8f0":"#1e293b",fontSize:14,outline:"none",resize:"vertical",minHeight:80,fontFamily:"inherit"}} placeholder="Adicionar descrição" value={agendaForm.descricao} onChange={e=>setAgendaForm({...agendaForm,descricao:e.target.value})}></textarea></div>
+              <div style={{display:"flex",gap:12,marginBottom:20,flexWrap:"wrap"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:16}}>🔔</span><select style={{padding:"8px 10px",borderRadius:8,border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",background:dark?"#0a1628":"#f8fafc",color:dark?"#e2e8f0":"#1e293b",fontSize:13,outline:"none"}} value={agendaForm.lembrete} onChange={e=>setAgendaForm({...agendaForm,lembrete:parseInt(e.target.value)})}>
+                  <option value={5}>5 min antes</option><option value={10}>10 min antes</option><option value={15}>15 min antes</option><option value={30}>30 min antes</option><option value={60}>1 hora antes</option><option value={120}>2 horas antes</option><option value={1440}>1 dia antes</option>
+                </select></div>
+                <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:16}}>🎨</span><select style={{padding:"8px 10px",borderRadius:8,border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",background:dark?"#0a1628":"#f8fafc",color:dark?"#e2e8f0":"#1e293b",fontSize:13,outline:"none"}} value={agendaForm.cor} onChange={e=>setAgendaForm({...agendaForm,cor:e.target.value})}>
+                  <option value="7">🔵 Pavão (Azul)</option><option value="2">🟢 Sálvia</option><option value="10">🌿 Manjericão</option><option value="1">💜 Lavanda</option><option value="3">🍇 Uva</option><option value="4">🌸 Flamingo</option><option value="6">🍊 Tangerina</option><option value="5">🍌 Banana</option><option value="11">🍅 Tomate</option><option value="8">⬛ Grafite</option>
+                </select></div>
+              </div>
+              <div style={{display:"flex",justifyContent:"flex-end",gap:10,paddingTop:16,borderTop:dark?"1px solid #1e3a5f":"1px solid #e2e8f0"}}>
+                <button onClick={()=>{setAgendaModal(null);setAgendaSaved(null);}} style={{padding:"10px 20px",borderRadius:8,border:dark?"1px solid #1e3a5f":"1px solid #e2e8f0",background:"transparent",color:"#64748b",cursor:"pointer",fontWeight:600,fontSize:14}}>Cancelar</button>
+                <button onClick={criarEvento} disabled={agendaSaving} style={{padding:"10px 24px",borderRadius:8,border:"none",cursor:agendaSaving?"not-allowed":"pointer",background:"linear-gradient(135deg,#4285f4,#34a853)",color:"#fff",fontWeight:700,fontSize:14,opacity:agendaSaving?0.7:1}}>
+                  {agendaSaving?"⏳ Criando...":"📅 Salvar evento"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>}
+
+      {/* MODAL ANOTAÇÕES */}
+      {anotaModal&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:450,padding:16}}>
+        <div style={{...C,maxWidth:520,width:"100%",maxHeight:"90vh",display:"flex",flexDirection:"column"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
+            <div><h3 style={{margin:0,color:dark?"#f0f9ff":S.text,fontSize:18}}>💬 Anotações</h3><p style={{margin:"4px 0 0",fontSize:13,color:S.text2}}>{anotaModal.nome} · {anotaModal.telefone}</p></div>
+            <button onClick={()=>setAnotaModal(null)} style={{background:"none",border:"none",color:S.text2,cursor:"pointer",fontSize:22,lineHeight:1}}>✕</button>
+          </div>
+          <div style={{flex:1,overflowY:"auto",marginBottom:16,display:"flex",flexDirection:"column",gap:10}}>
+            {(!anotaModal.anotacoes||anotaModal.anotacoes.length===0)&&<div style={{textAlign:"center",padding:"32px 0",color:S.text2}}><div style={{fontSize:36,marginBottom:8}}>💬</div><p style={{margin:0,fontSize:13}}>Nenhuma anotação ainda.</p></div>}
+            {(anotaModal.anotacoes||[]).map((a,i)=>(
+              <div key={i} style={{background:dark?"#0a1628":"#f0f4f8",border:S.border,borderRadius:12,padding:"12px 14px"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:14,color:dark?"#e2e8f0":S.text,lineHeight:1.5,marginBottom:6}}>{a.texto}</div>
+                    <div style={{display:"flex",gap:10,fontSize:11,color:S.text2}}><span>👤 {a.por}</span><span>🕐 {new Date(a.quando).toLocaleString("pt-BR")}</span></div>
+                  </div>
+                  {(session?.role==="admin"||a.por===session?.nome)&&<button onClick={()=>deletarAnota(anotaModal.id,i)} style={{background:"none",border:"none",color:"#f87171",cursor:"pointer",fontSize:16,padding:0,flexShrink:0}}>🗑️</button>}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{borderTop:S.border,paddingTop:16}}>
+            <textarea style={{...I,minHeight:80,resize:"none",fontFamily:"inherit",marginBottom:10}} placeholder="Digite sua anotação... (Ctrl+Enter para salvar)" value={anotaTexto} onChange={e=>setAnotaTexto(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&e.ctrlKey)salvarAnota();}}></textarea>
+            <div style={{display:"flex",gap:10,alignItems:"center"}}>
+              <span style={{fontSize:11,color:S.text2,flex:1}}>Ctrl+Enter para salvar</span>
+              <button onClick={()=>setAnotaModal(null)} style={{...BS,padding:"10px 16px"}}>Fechar</button>
+              <button onClick={salvarAnota} disabled={!anotaTexto.trim()} style={{padding:"10px 20px",borderRadius:10,border:"none",cursor:anotaTexto.trim()?"pointer":"not-allowed",background:anotaTexto.trim()?"linear-gradient(135deg,#a78bfa,#7c3aed)":"#1e3a5f",color:"#fff",fontWeight:700,fontSize:14,opacity:anotaTexto.trim()?1:0.5}}>💬 Salvar</button>
+            </div>
+          </div>
+        </div>
+      </div>}
+
+      {/* MODAL CSV */}
+      {csvModal&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.9)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:500,padding:16}}>
+        <div style={{...C,maxWidth:680,width:"100%",maxHeight:"90vh",display:"flex",flexDirection:"column"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+            <div><h3 style={{margin:0,color:dark?"#f0f9ff":S.text,fontSize:18}}>📊 Dados para Google Sheets</h3><p style={{margin:"4px 0 0",fontSize:12,color:S.text2}}>{rows.length} registros · Copie e cole no Google Sheets</p></div>
+            <button onClick={()=>setCsvModal(null)} style={{background:"none",border:"none",color:S.text2,cursor:"pointer",fontSize:22}}>✕</button>
+          </div>
+          <div style={{background:dark?"#0a1628":"#f0f4f8",border:S.border,borderRadius:10,padding:4,flex:1,overflow:"hidden",display:"flex",flexDirection:"column",marginBottom:16}}>
+            <textarea id="csv-textarea" readOnly value={csvModal} style={{flex:1,width:"100%",minHeight:240,background:"transparent",border:"none",color:S.text2,fontSize:11,fontFamily:"monospace",resize:"none",outline:"none",padding:12,boxSizing:"border-box"}}></textarea>
+          </div>
+          <div style={{background:dark?"#0d2137":"#e2e8f0",border:"1px solid #b8975a33",borderRadius:10,padding:"12px 16px",marginBottom:16}}>
+            <p style={{margin:0,fontSize:12,color:"#b8975a",fontWeight:600}}>📌 Google Sheets: Abra → célula A1 → Cole (Ctrl+V) → pronto! ✅</p>
+          </div>
+          <div style={{display:"flex",gap:10}}>
+            <button onClick={()=>setCsvModal(null)} style={{...BS,flex:1}}>Fechar</button>
+            <button onClick={copiarCSV} style={{flex:2,padding:"13px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#10b981,#06b6d4)",color:"#fff",fontWeight:800,fontSize:15}}>📋 Copiar tudo (Ctrl+C)</button>
+          </div>
+        </div>
+      </div>}
+
+      <style>{"@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&display=swap');*{box-sizing:border-box}input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.5)}@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}select option{background:#1e293b;color:#e2e8f0}textarea{display:block}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#b8975a55;border-radius:99px}"}</style>
+    </div>
+  );
+}
+
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  </script>
+</body>
+</html>
